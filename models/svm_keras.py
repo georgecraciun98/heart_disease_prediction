@@ -8,7 +8,7 @@ Created on Mon Feb  1 15:22:20 2021
 #path = "G:/Freelancing/Machine Learning Videos/Module 4/Data/"
 import pandas as pd
 
-df1 = pd.read_csv("heart.csv")
+df1 = pd.read_csv("../heart.csv")
 df1.shape
 df1.columns
 df1.head(10)
@@ -16,6 +16,7 @@ df1.head(10)
 
 from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
+
 
 def label_encoder(df1,column):
     le = preprocessing.LabelEncoder()
@@ -78,13 +79,32 @@ score = model.evaluate(x_test, y_test, verbose=0)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
 predict=model.predict(x_test)
+
+
+y_pred=np.where(predict >= 0.5,1,0)
+
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix,roc_curve, f1_score,roc_auc_score
+accuracy_score(y_test,y_pred)
+confusion_matrix(y_test,y_pred)
+
+
+precision_score(y_test,y_pred)
+recall_score(y_test,y_pred)
+f1_score(y_test,y_pred)
+fpr,tpr,thresholds =  roc_curve(y_test,y_pred)
+
+import matplotlib.pyplot as plt
+plt.plot(fpr,tpr,"b")
+plt.plot([0,1],[0,1],"r-")
+roc_auc_score(y_test,y_pred)
+
+
 m1 = tf.keras.metrics.MeanSquaredError()
 m1.update_state(predict,y_test)
 m1.result().numpy()
 
 
-
-
+#Using hyperparameters
 
 
 

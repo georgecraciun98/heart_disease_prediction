@@ -48,7 +48,7 @@ from tensorflow.keras.layers.experimental import RandomFourierFeatures
 
 import numpy as np
 #scale all the data to 0, 1 values
-
+#Normalized data
 for column in numeric_variables:
     new_df1[column]=new_df1[column]/np.max(new_df1[column])
 
