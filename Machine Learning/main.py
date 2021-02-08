@@ -102,7 +102,7 @@ def linear_regresion():
     m1.update_state(y_pred,y_test)
     m1.result().numpy()
     #0.13 MSE
-
+    
 
 #Logistic Regression
 def logistic_regretion():
