@@ -48,7 +48,7 @@ import numpy as np
 #scale all the data to 0, 1 values
 
 for column in numeric_variables:
-    new_df1[column]=new_df1[column]/np.max(new_df1[column])
+    new_df1[column]=new_df1[column]/np.std(new_df1[column], axis = 0)
 
 x_train, x_test, y_train , y_test = train_test_split(new_df1,df1[target_variable],test_size=0.3)
 
@@ -56,6 +56,7 @@ x_val = x_train[-30:]
 y_val = y_train[-30:]
 x_train = x_train[:-30]
 y_train = y_train[:-30]
+
 model = keras.Sequential(
     [
         layers.Dense(20, input_shape=(30,)),
