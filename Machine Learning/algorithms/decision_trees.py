@@ -8,7 +8,13 @@ Created on Wed Feb  3 19:16:54 2021
 
 
 import pandas as pd
-from decision_tree_python import decision_tree,evaluate_algorithm
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.layers.experimental import RandomFourierFeatures
+import numpy as np
+
 df1 = pd.read_csv("../heart.csv")
 
 df1.shape
@@ -16,8 +22,6 @@ df1.columns
 df1.head(10)
 
 
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
 
 def label_encoder(df1,column):
     le = preprocessing.LabelEncoder()
@@ -38,15 +42,6 @@ for column in categorical_variables:
 new_df1=pd.concat([new_df1,df1['target']],axis=1)
 
 
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.layers.experimental import RandomFourierFeatures
-
-
-#keras model 
-
-
-import numpy as np
 #scale all the data to 0, 1 values
 #Normalized data
 for column in numeric_variables:
@@ -56,7 +51,3 @@ n_folds = 5
 max_depth = 5
 min_size = 10
 
-scores = evaluate_algorithm(new_df1.values.tolist(), decision_tree, n_folds, max_depth, min_size)
-
-print('Scores: %s' % scores)
-print('Mean Accuracy: %.3f%%' % (sum(scores)/float(len(scores))))

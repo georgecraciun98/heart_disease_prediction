@@ -14,38 +14,15 @@ from tensorflow.keras.models import load_model
 
 from keras import Sequential
 from tensorflow.keras.layers import Dense
+from algorithms.svm_keras import model_loading
+from algorithms.data_processing import accuracy_metrics,load_encoder,split_data
+from sklearn.linear_model import LogisticRegression
+from tensorflow.keras import layers
+from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
+from keras.regularizers import l2
+from tensorflow.keras import activations
 
-
-df = pd.read_csv("./heart.csv")
-df.head()
-
-
-
-df.isna().sum()
-
-categorical_val = []
-continous_val = []
-    
 # Let's make our correlation matrix a little prettier
-def remove_cat_value():
-    
-    for column in df.columns:
-        print('==============================')
-        print(f"{column} : {df[column].unique()}")
-        if len(df[column].unique()) <= 10:
-            categorical_val.append(column)
-        else:
-            continous_val.append(column)
-        
-    categorical_val.remove('target')
-    dataset = pd.get_dummies(df, columns = categorical_val)
-    
-    s_sc=StandardScaler()
-    col_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-    dataset[col_to_scale] = s_sc.fit_transform(dataset[col_to_scale])
-    return dataset
-
-
 
 
 def print_score(clf, X_train, y_train, X_test, y_test, train=True):
@@ -69,17 +46,7 @@ def print_score(clf, X_train, y_train, X_test, y_test, train=True):
         print("_______________________________________________")
         print(f"Confusion Matrix: \n {confusion_matrix(y_test, pred)}\n")
         
-dataset = remove_cat_value()
-        
-X = dataset.drop('target', axis=1)
-y = dataset.target
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-
-x_val = X_train[-30:]
-y_val = y_train[-30:]
-X_train = X_train[:-30]
-y_train = y_train[:-30]
 def linear_regresion():
     
     model=keras.Sequential([
@@ -129,10 +96,7 @@ def logistic_regretion():
     predict=model.predict(X_test)
     #0.27 MSE
     
-from tensorflow.keras import layers
-from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
-from keras.regularizers import l2
-from tensorflow.keras import activations
+
 def support_vector_machine():
    
     model = keras.Sequential(
@@ -160,10 +124,7 @@ def support_vector_machine():
     m1.update_state(predict,y_test)
     m1.result().numpy()
     
-    
-    
-                                                                                                                                        
-#support_vector_machine()   
+
 
 def decision_tree_classifier():
     pass    
@@ -178,10 +139,30 @@ def xg_boost_classifier():
 
 #print_score(model,X_train,y_train,X_test,y_test,train=False)
 
+if __name__ == "__main__":
+        
 
+    df = pd.read_csv("./heart.csv")
+
+    input_shape=15
+    model=model_loading(input_shape)
+    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df)
+        
+    encoder=load_encoder('models/encoder_30.h5')   
+
+    X_train_encode = encoder.predict(X_train)
+    # encode the test data
+    X_test_encode = encoder.predict(X_test)                                                                                             
+    #support_vector_machine()   
     
+    # fit model on training set
+    model.fit(X_train_encode, y_train)
+    # make prediction on test set
+    binary_class = lambda x : 1 if (x>=0.5) else 0 
     
-    
+    y_pred = model.predict(X_test_encode)
+    y_pred=np.array([binary_class(i) for i in y_pred])
+    accuracy_metrics(y_pred,y_test)
     
     
     
