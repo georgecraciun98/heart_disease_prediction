@@ -14,62 +14,15 @@ from tensorflow.keras.models import load_model
 
 from keras import Sequential
 from tensorflow.keras.layers import Dense
+from algorithms.svm_keras import model_loading
+from algorithms.data_processing import accuracy_metrics,load_encoder,split_data
+from sklearn.linear_model import LogisticRegression
+from tensorflow.keras import layers
+from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
+from keras.regularizers import l2
+from tensorflow.keras import activations
 
-df = pd.read_csv("./heart.csv")
-df.head()
-
-
-
-df.isna().sum()
-
-categorical_val = []
-continous_val = []
-
-#append continous variables 
-
-for column in df.columns:
-    print('==============================')
-    print(f"{column} : {df[column].unique()}")
-    if len(df[column].unique()) <= 10:
-        categorical_val.append(column)
-    else:
-        continous_val.append(column)
-        
-
-plt.figure(figsize=(15, 15))
-
-# 9 plots for statistics
-for i, column in enumerate(categorical_val, 1):
-    plt.subplot(3, 3, i)
-    df[df["target"] == 0][column].hist(bins=35, color='blue', label='Have Heart Disease = NO', alpha=0.6)
-    df[df["target"] == 1][column].hist(bins=35, color='red', label='Have Heart Disease = YES', alpha=0.6)
-    plt.legend()
-    plt.xlabel(column)
-    
-    
-    
 # Let's make our correlation matrix a little prettier
-def remove_cat_value():
-    
-    corr_matrix = df.corr()
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax = sns.heatmap(corr_matrix,
-                     annot=True,
-                     linewidths=0.5,
-                     fmt=".2f",
-                     cmap="YlGnBu");
-    bottom, top = ax.get_ylim()
-    ax.set_ylim(bottom + 0.5, top - 0.5)
-    
-    categorical_val.remove('target')
-    dataset = pd.get_dummies(df, columns = categorical_val)
-    
-    s_sc=StandardScaler()
-    col_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-    dataset[col_to_scale] = s_sc.fit_transform(dataset[col_to_scale])
-    return dataset
-
-
 
 
 def print_score(clf, X_train, y_train, X_test, y_test, train=True):
@@ -93,15 +46,8 @@ def print_score(clf, X_train, y_train, X_test, y_test, train=True):
         print("_______________________________________________")
         print(f"Confusion Matrix: \n {confusion_matrix(y_test, pred)}\n")
         
-dataset = remove_cat_value()
-        
-X = dataset.drop('target', axis=1)
-y = dataset.target
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
-
-
-def linear_regretion():
+def linear_regresion():
     
     model=keras.Sequential([
         Dense(32,activation=tf.nn.relu,input_shape=[30]),
@@ -113,7 +59,7 @@ def linear_regretion():
     optimizer = tf.keras.optimizers.RMSprop(0.0099)
     model.compile(loss='mean_squared_error',optimizer=optimizer)
     model.fit(X_train,y_train,epochs=500)
-    plt.scatter(X['chol'],y)  
+ 
     model.save("my_model01.h5")
     
     model1=keras.models.load_model("my_model01.h5")
@@ -123,7 +69,7 @@ def linear_regretion():
     m1.update_state(y_pred,y_test)
     m1.result().numpy()
     #0.13 MSE
-
+    
 
 #Logistic Regression
 def logistic_regretion():
@@ -134,7 +80,7 @@ def logistic_regretion():
     
     model = keras.Sequential()
     model.add(Dense(1, activation='sigmoid', kernel_regularizer=reg,input_shape=[30]))
-    model.compile(optimizer='rmsprop', loss='binary_crossentropy')
+    model.compile(optimizer='rmsprop', loss='binary_crossentropy',metrics=[keras.metrics.CategoricalAccuracy(name="acc")])
     model.fit(X_train, y_train, epochs=500, validation_data=(X_test, y_test))
     model.save("my_model02.h5")
     y_pred=model.predict(X_test)
@@ -142,51 +88,81 @@ def logistic_regretion():
     m1 = tf.keras.metrics.MeanSquaredError()
     m1.update_state(y_pred,y_test)
     m1.result().numpy()
+    
+    score = model.evaluate(X_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+    
+    predict=model.predict(X_test)
     #0.27 MSE
     
-from tensorflow.keras import layers
-from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
 
 def support_vector_machine():
-    
-
-    
+   
     model = keras.Sequential(
     [
-        keras.Input(shape=(30,)),
+        layers.Dense(20, input_shape=(30,)),
         RandomFourierFeatures(
-            output_dim=4096, scale=10.0, kernel_initializer="gaussian"
+            output_dim=4096, kernel_initializer="gaussian"
         ),
-        layers.Dense(units=1),
+        layers.Dense(units=1,activation='sigmoid'),
     ]
     )
     model.compile(
-    optimizer=keras.optimizers.Adam(learning_rate=1e-3),
-    loss=keras.losses.hinge,
-    metrics=[keras.metrics.CategoricalAccuracy(name="acc")],
+        optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+        loss=keras.losses.hinge,
+        metrics=['binary_accuracy'],
     )
-    model.fit(X_train, y_train, epochs=20, batch_size=128, validation_split=0.2)
+    
+    model.fit(X_train,y_train,epochs=15,validation_data=(x_val, y_val))
     model.save("my_model03.h5")
-    y_pred=model.predict(X_test)
-    
+    score = model.evaluate(X_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+    predict=model.predict(X_test)
     m1 = tf.keras.metrics.MeanSquaredError()
-    m1.update_state(y_pred,y_test)
+    m1.update_state(predict,y_test)
     m1.result().numpy()
-                                                                                                                                        
-support_vector_machine()   
     
 
 
+def decision_tree_classifier():
+    pass    
 
-model=load_model("my_model03.h5",{"RandomFourierFeatures":RandomFourierFeatures},False)
-y_pred=model.predict(X_test)
+def random_forest_classifier():
+    pass
+def xg_boost_classifier():
+    pass
+
+#model=load_model("my_model03.h5",{"RandomFourierFeatures":RandomFourierFeatures},False)
+#y_pred=model.predict(X_test)
+
+#print_score(model,X_train,y_train,X_test,y_test,train=False)
+
+if __name__ == "__main__":
+        
+
+    df = pd.read_csv("./heart.csv")
+
+    input_shape=15
+    model=model_loading(input_shape)
+    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df)
+        
+    encoder=load_encoder('models/encoder_30.h5')   
+
+    X_train_encode = encoder.predict(X_train)
+    # encode the test data
+    X_test_encode = encoder.predict(X_test)                                                                                             
+    #support_vector_machine()   
     
-m1 = tf.keras.metrics.MeanSquaredError()
-m1.update_state(y_pred,y_test)
-m1.result().numpy()
+    # fit model on training set
+    model.fit(X_train_encode, y_train)
+    # make prediction on test set
+    binary_class = lambda x : 1 if (x>=0.5) else 0 
     
-    
-    
+    y_pred = model.predict(X_test_encode)
+    y_pred=np.array([binary_class(i) for i in y_pred])
+    accuracy_metrics(y_pred,y_test)
     
     
     
