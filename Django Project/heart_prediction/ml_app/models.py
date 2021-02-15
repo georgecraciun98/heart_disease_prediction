@@ -1,6 +1,11 @@
 from django.db import models
 from ml_app.Validators.health_record_validator import validate_age,\
     validate_trebtps,validate_thalach,validate_oldpeak
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import User
 # Create your models here.
 class HealthRecord(models.Model):
     class SexClass(models.TextChoices):
@@ -23,6 +28,7 @@ class HealthRecord(models.Model):
         Type_0=0
         Type_1=1
         Type_2=2
+    user=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="user_id",blank=True,null=True)
     age=models.FloatField(validators=[validate_age])
     sex=models.CharField(max_length=2,choices=SexClass.choices,default=SexClass.Male)
     """
@@ -95,3 +101,10 @@ class HealthRecord(models.Model):
     target - have disease or not (1=yes, 0=no) (= the predicted attribute)
     """
     target=models.IntegerField(blank=True,choices=BinaryChoices.choices)
+
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)

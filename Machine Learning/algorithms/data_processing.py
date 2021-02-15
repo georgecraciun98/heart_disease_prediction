@@ -96,6 +96,8 @@ def accuracy_metrics(y_test,y_pred):
     
     plt.plot(fpr,tpr,"b")
     plt.plot([0,1],[0,1],"r-")
+    plt.xlabel('Specificity')
+    plt.ylabel('Sensitivity')
     plt.show()
     print('roc auc score',roc_auc_score(y_test,y_pred))
     
