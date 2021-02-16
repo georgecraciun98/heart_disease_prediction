@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
+
 # Create your models here.
 class HealthRecord(models.Model):
     class SexClass(models.TextChoices):
@@ -102,6 +103,8 @@ class HealthRecord(models.Model):
     """
     target=models.IntegerField(blank=True,choices=BinaryChoices.choices)
 
+    def __str__(self):
+        return 'User: '+str(self.age)+' thal: '+str(self.thal)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

@@ -11,7 +11,7 @@ from xgboost import XGBClassifier
 def model_loading(input_shape):
     
 
-    model=XGBClassifier(n_estimators=1600,learning_rate=0.01,max_depth=10,gamma=0)
+    model=XGBClassifier(n_estimators=1600,learning_rate=0.01,max_depth=10,gamma=0,use_label_encoder=False)
     return model
 
 

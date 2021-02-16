@@ -13,8 +13,15 @@ class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     user_id=serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-
+    print(user_id)
     class Meta:
         model=HealthRecord
         fields=('age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang',
                 'oldpeak','slope','ca','thal','target','user_id')
+
+class GetRecordSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model=HealthRecord
+        fields=['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang',
+                'oldpeak','slope','ca','thal','target']

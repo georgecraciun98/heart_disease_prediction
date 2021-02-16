@@ -53,9 +53,53 @@ def normalize_data(df1):
         
     return new_df1,target_variable
         
+def featured_normalization_data(df):
+    #corelate each row with target and select only positive values
+    corelate_positive=df.corr()[:]['target']>0.2
+    corelate_negative=df.corr()[:]['target']<-0.2
 
-def split_data(df1):
-    new_df1,target_variable=normalize_data(df1)
+    
+    columns_df=pd.DataFrame(corelate_positive)
+    columns_df_negative=pd.DataFrame(corelate_negative)
+    
+    columns_df=columns_df.drop('target')
+    columns_df_negative=columns_df_negative.drop('target')
+    target_variable = ["target"]
+    categorical_variables=[]
+    numeric_variables=[]
+    
+    columns_negative=columns_df[columns_df_negative['target']].index
+    column_positive=columns_df[columns_df['target']].index
+    all_columns=[*column_positive,*columns_negative]
+    for column in all_columns:
+        
+        if len(df[column].unique()) <= 10:
+            categorical_variables.append(column)
+        else:
+            numeric_variables.append(column)
+    
+    print('categorical variables are',categorical_variables)
+    
+    print('numerical variables are ',numeric_variables)
+    
+    
+    
+    new_df1 = df[numeric_variables]
+
+    for column in categorical_variables:
+        new_df1= pd.concat([new_df1,label_encoder(df,column)],axis=1)
+    #data normalization by std deviation
+    for column in numeric_variables:
+        new_df1[column]=new_df1[column]/np.std(new_df1[column], axis = 0)
+        
+    return new_df1,target_variable
+    
+
+def split_data(df1,featured=False):
+    if featured == True:
+        new_df1,target_variable=featured_normalization_data(df1)
+    else: 
+        new_df1,target_variable=normalize_data(df1)
     
     x_train, x_test, y_train , y_test = train_test_split(new_df1,df1[target_variable],test_size=0.3)
     
@@ -64,6 +108,22 @@ def split_data(df1):
     x_train = x_train[:-30]
     y_train = y_train[:-30]
     return x_train,y_train,x_test,y_test,x_val,y_val
+
+def split_input_output(df1,featured=False):
+    if featured == True:
+        new_df1,target_variable=featured_normalization_data(df1)
+    else: 
+        new_df1,target_variable=normalize_data(df1)
+    
+    x_train, x_test, y_train , y_test = train_test_split(new_df1,df1[target_variable],test_size=0.3)
+    
+    x_val = x_train[-30:]
+    y_val = y_train[-30:]
+    x_train = x_train[:-30]
+    y_train = y_train[:-30]
+    return x_train,y_train,x_test,y_test,x_val,y_val
+
+
 def remove_cat_value(df,categorical_val,continous_val):
     
     for column in df.columns:

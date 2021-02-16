@@ -27,7 +27,9 @@ from algorithms.binary_classifier import model_loading as loading_binary
 from algorithms.xg_boost import model_loading as loading_xg
 from algorithms.random_forest import model_loading as load_forest
 import joblib
-
+from sklearn.model_selection import StratifiedKFold
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
 # Let's make our correlation matrix a little prettier
 
 
@@ -148,15 +150,16 @@ def save_sklearn_model(model,filename = 'finalized_model.sav'):
 
 #print_score(model,X_train,y_train,X_test,y_test,train=False)
 
+
 if __name__ == "__main__":
         
 
     df = pd.read_csv("./heart.csv")
 
-    input_shape=30
-    model=load_forest()
-    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df)
-        
+    input_shape=23
+    model=loading_binary(input_shape)
+    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df,featured=True)
+    corr=df.corr()    
     #encoder=load_encoder('models/encoder_30.h5')   
 
     #X_train_encode = encoder.predict(X_train)
@@ -166,12 +169,21 @@ if __name__ == "__main__":
     
     # fit model on training set
     model.fit(X_train, y_train)
-    save_sklearn_model(model,'./models/sklearn.sav')
+    #save_sklearn_model(model,'./models/sklearn.sav')
     # make prediction on test set
     binary_class = lambda x : 1 if (x>=0.5) else 0 
     
     y_pred = model.predict(X_test)
     y_pred=np.array([binary_class(i) for i in y_pred])
+    
+    x_total=pd.concat([X_train,X_test],axis=0,ignore_index=True,verify_integrity=True)
+    y_total=pd.concat([y_train,y_test],axis=0,ignore_index=True,verify_integrity=True)
+    estimator = KerasClassifier(build_fn=loading_binary,input_shape=input_shape, epochs=100, batch_size=5, verbose=0)
+    kfold = StratifiedKFold(n_splits=10, shuffle=True)
+    results = cross_val_score(estimator, x_total, y_total, cv=kfold)
+    print("Baseline: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
+    
+    
     accuracy_metrics(y_pred,y_test)
     
     
