@@ -1,4 +1,4 @@
-from ml_app.Serializers.health_record_serializer import HealthRecordSerializer
+from ml_app.Serializers.health_serializer import HealthRecordSerializer
 import os
 from django.contrib.auth.models import User
 

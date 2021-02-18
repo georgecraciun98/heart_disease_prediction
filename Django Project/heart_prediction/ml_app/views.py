@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, Http404
 from django.conf import settings
+from rest_framework.reverse import reverse
 
 from . import models
 from .apps import MlAppConfig
@@ -15,8 +16,8 @@ from scipy import ndimage
 from scipy.ndimage import zoom
 from django.apps import apps
 from django.contrib.auth.models import User, Group
-from ml_app.models import HealthRecord
-from rest_framework import viewsets, status, mixins, generics
+from ml_app.models import HealthRecordModel
+from rest_framework import viewsets, status, mixins, generics, renderers
 from rest_framework import permissions
 from ml_app.Serializers.user_serializers import UserSerializer
 from rest_framework.views import APIView
@@ -26,7 +27,8 @@ from django.contrib.auth.models import User
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from ml_app.Serializers.health_record_serializer import HealthRecordSerializer, GetRecordSerializer
+from ml_app.Serializers.health_serializer import HealthRecordSerializer, GetRecordSerializer
+from .permissions import IsOwnerOrReadOnly
 
 
 @api_view(["POST"])
@@ -72,18 +74,22 @@ class ListUsers(APIView):
         return Response(usernames)
 
 class CustomAuthToken(ObtainAuthToken):
-
     def post(self, request, *args, **kwargs):
-
+        # serializer = UserSerializer
+        # serializer = UserSerializer(data=request.data,
+        #                                    context={'request': request})
+        # serializer.is_valid(raise_exception=True)
+        # user = serializer.validated_data['user']
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
+        print("username is {}".format(user.username))
+        token, created = Token.objects.get_or_create(user)
+        print('hello')
         return Response({
             'token': token.key,
             'user_id': user.pk,
-            'email': user.email
         })
 import io
 from rest_framework.parsers import JSONParser
@@ -94,8 +100,8 @@ class HealthRecord(APIView,mixins.ListModelMixin):
     from ml_app import  models
     def get_object(self, pk):
         try:
-            return models.HealthRecord.objects.get(pk=pk)
-        except models.HealthRecord.DoesNotExist:
+            return models.HealthRecordModel.objects.get(pk=pk)
+        except models.HealthRecordModel.DoesNotExist:
             raise Http404
     def post(self, request, *args, **kwargs):
         user=request.user
@@ -123,6 +129,45 @@ class HealthRecord(APIView,mixins.ListModelMixin):
     #
     #        return Response(serializer.validated_data,status=status.HTTP_200_OK)
     #     return Response({"message":"SORRY"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class HealthRecordList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+    queryset = HealthRecordModel.objects.all()
+    serializer_class = HealthRecordSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user)
+
+class HealthRecordDetail(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+    queryset = HealthRecordModel.objects.all()
+    serializer_class = HealthRecordSerializer
+
+# class Recordhighlight(generics.GenericAPIView):
+#     queryset = HealthRecordModel.objects.all()
+#     renderer_classes = [renderers.StaticHTMLRenderer]
+#
+#     def get(self, request, *args, **kwargs):
+#         record = self.get_object()
+#         return Response(record.highlighted)
+
+
 class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'users': reverse('user-list', request=request, format=format),
+        'records': reverse('record-list', request=request, format=format)
+    })

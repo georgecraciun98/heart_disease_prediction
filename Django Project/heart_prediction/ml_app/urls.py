@@ -8,13 +8,16 @@ from ml_app import views
 
 
 router=routers.DefaultRouter()
-router.register('api/healthrecord',HealthRecordViewSet,'health')
+router.register('healthrecord',HealthRecordViewSet,'health')
 
 urlpatterns = [
-    path('', include(router.urls)),
-    path('users/',views.ListUsers.as_view()),
-    path('health_record/',views.HealthRecord.as_view()),
-    path('health_record/',views.UserList.as_view()),
-    path('token/auth/', views.ObtainAuthToken.as_view()),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    # path('', include(router.urls)),
+    path('', views.api_root),
+    # path('users/',views.ListUsers.as_view()),
+    path('health_record/', views.HealthRecordList.as_view(),name='record-list'),
+    path('health_record/<int:pk>/',views.HealthRecordDetail.as_view(),name='record-detail'),
+    path('users/', views.UserList.as_view(),name='user-list'),
+    path('users/<int:pk>/', views.UserDetail.as_view(),name='user-detail'),
+    path('token-auth/', views.CustomAuthToken.as_view()),
+    # path('token-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
