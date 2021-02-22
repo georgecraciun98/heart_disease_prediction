@@ -1,5 +1,5 @@
 from django.db import models
-from ml_app.Validators.health_record_validator import validate_age,\
+from ml_app.validators.health_record_validator import validate_age,\
     validate_trebtps,validate_thalach,validate_oldpeak
 from django.conf import settings
 from django.db.models.signals import post_save
@@ -106,7 +106,7 @@ class HealthRecordModel(models.Model):
     target=models.IntegerField(blank=True,choices=BinaryChoices.choices)
 
     def __str__(self):
-        return 'User: '+str(self.age)+' thal: '+str(self.thal)
+        return 'Patient age: '+str(self.age)+' thal: '+str(self.thal)+' trestbps: '+str(self.trestbps)
 
     def save(self, *args, **kwargs):
         """
@@ -115,6 +115,9 @@ class HealthRecordModel(models.Model):
         """
 
         super(HealthRecordModel, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = "HeathRecords"
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

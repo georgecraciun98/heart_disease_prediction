@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'djoser',
     'ml_app',
     'rest_framework.authtoken',
     'corsheaders',
@@ -113,6 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'PAGE_SIZE': 10
 }
 # define which origins are allowed
@@ -124,6 +126,16 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000', 'localhost:3001'
 )
+DJOSER = {
+    "USER_ID_FIELD": "username",
+    "LOGIN_FIELD": "username",
+    "SEND_ACTIVATION_EMAIL": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "reset_password/{uid}/{token}",
+    'SERIALIZERS': {
+        'token_create': 'ml_app.serializers.token_serializer.CustomTokenCreateSerializer',
+    },
+}
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 

@@ -109,6 +109,19 @@ def split_data(df1,featured=False):
     y_train = y_train[:-30]
     return x_train,y_train,x_test,y_test,x_val,y_val
 
+def split_data_drop(df1,featured=False):
+    if featured == True:
+        new_df1,target_variable=featured_normalization_data(df1)
+    else: 
+        new_df1,target_variable=normalize_data(df1)
+    df1.drop(df1.index[282:])
+    x_train, x_test, y_train , y_test = train_test_split(new_df1,df1[target_variable],test_size=0.3)
+    
+    x_val = x_train[-30:]
+    y_val = y_train[-30:]
+    x_train = x_train[:-30]
+    y_train = y_train[:-30]
+    return x_train,y_train,x_test,y_test,x_val,y_val
 def split_input_output(df1,featured=False):
     if featured == True:
         new_df1,target_variable=featured_normalization_data(df1)

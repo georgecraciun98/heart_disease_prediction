@@ -1,4 +1,4 @@
-from ml_app.Serializers.user_serializers import UserSerializer
+from ml_app.serializers.user_serializers import UserSerializer
 from ml_app.models import HealthRecordModel
 from django.contrib.auth.models import User
 from rest_framework import serializers
@@ -13,7 +13,7 @@ class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     #user_id=serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-    user_id = serializers.ReadOnlyField(source='user_id.id')
+    user_id = serializers.IntegerField()
 
     class Meta:
         model=HealthRecordModel

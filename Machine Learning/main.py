@@ -14,7 +14,7 @@ from tensorflow.keras.models import load_model
 
 from keras import Sequential
 from tensorflow.keras.layers import Dense
-from algorithms.data_processing import accuracy_metrics,load_encoder,split_data
+from algorithms.data_processing import accuracy_metrics,load_encoder,split_data,split_data_drop
 from sklearn.linear_model import LogisticRegression
 from tensorflow.keras import layers
 from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
@@ -156,9 +156,9 @@ if __name__ == "__main__":
 
     df = pd.read_csv("./heart.csv")
 
-    input_shape=23
+    input_shape=30
     model=loading_binary(input_shape)
-    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df,featured=True)
+    X_train,y_train,X_test,y_test,x_val,y_val=split_data_drop(df,featured=False)
     corr=df.corr()    
     #encoder=load_encoder('models/encoder_30.h5')   
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     print("Baseline: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
     
     
-    accuracy_metrics(y_pred,y_test)
+    #accuracy_metrics(y_pred,y_test)
     
     
     
