@@ -1,7 +1,9 @@
-from ml_app.serializers.user_serializers import UserSerializer
 from ml_app.models import HealthRecordModel
-from django.contrib.auth.models import User
 from rest_framework import serializers
+from rest_framework import serializers
+
+from ml_app.models import HealthRecordModel
+
 
 class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
     def get_queryset(self):

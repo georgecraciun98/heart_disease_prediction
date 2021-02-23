@@ -1,29 +1,14 @@
-from django.shortcuts import render
-from django.http import JsonResponse, Http404
-from django.conf import settings
-from rest_framework.reverse import reverse
-from django.contrib.auth import authenticate, get_user_model
-
-from . import models
-from .apps import MlAppConfig
-from rest_framework.decorators import api_view
-
-from django.apps import apps
-from django.contrib.auth.models import User, Group
-from ml_app.models import HealthRecordModel
-from rest_framework import viewsets, status, mixins, generics, renderers
-from rest_framework import permissions
-from ml_app.serializers.user_serializers import UserSerializer
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
-from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.authtoken.models import Token
+from rest_framework import generics
+from rest_framework import permissions
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from ml_app.serializers.health_serializer import HealthRecordSerializer, GetRecordSerializer
-from .permissions import IsOwnerOrReadOnly
+from rest_framework.reverse import reverse
 
+from ml_app.models import HealthRecordModel
+from ml_app.serializers.health_serializer import HealthRecordSerializer
+from ml_app.serializers.user_serializers import UserSerializer
+from .permissions import IsOwnerOrReadOnly
 
 
 class HealthRecordList(generics.ListCreateAPIView):
@@ -43,7 +28,7 @@ class HealthRecordDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 
-class UserList(generics.ListAPIView):
+class UserList(generics.ListCreateAPIView):
     queryset = User.objects.order_by('id').all()
     serializer_class = UserSerializer
     def list(self, request, *args, **kwargs):

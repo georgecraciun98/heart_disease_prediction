@@ -1,12 +1,16 @@
-from django.db import models
-from ml_app.validators.health_record_validator import validate_age,\
-    validate_trebtps,validate_thalach,validate_oldpeak
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
 
+from ml_app.validators.health_record_validator import validate_age, \
+    validate_trebtps, validate_thalach, validate_oldpeak
+
+User._meta.get_field('email')._unique = True
+User._meta.get_field('email').blank = False
+User._meta.get_field('email').null = False
 # Create your models here.
 class HealthRecordModel(models.Model):
     class SexClass(models.TextChoices):

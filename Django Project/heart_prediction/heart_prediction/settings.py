@@ -95,9 +95,13 @@ DATABASES = {
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -126,9 +130,11 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000', 'localhost:3001'
 )
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 DJOSER = {
     "USER_ID_FIELD": "username",
-    "LOGIN_FIELD": "username",
+    "LOGIN_FIELD": "email",
     "SEND_ACTIVATION_EMAIL": True,
     "ACTIVATION_URL": "activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "reset_password/{uid}/{token}",
@@ -136,6 +142,7 @@ DJOSER = {
         'token_create': 'ml_app.serializers.token_serializer.CustomTokenCreateSerializer',
     },
 }
+SITE_NAME = "HeartRecord"
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 

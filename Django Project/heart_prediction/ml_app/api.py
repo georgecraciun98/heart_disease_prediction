@@ -1,6 +1,8 @@
+from rest_framework import viewsets, permissions, authentication
+
 from ml_app.models import HealthRecordModel
-from rest_framework import viewsets,permissions,authentication
 from ml_app.serializers.health_serializer import HealthRecordSerializer
+
 
 #viewsuts allows us to quicker cruds
 
