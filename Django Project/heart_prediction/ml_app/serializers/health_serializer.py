@@ -15,7 +15,7 @@ class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 
 class HealthRecordSerializer(serializers.ModelSerializer):
     #user_id=serializers.PrimaryKeyRelatedField(many=True,read_only=True)
-    user_id = serializers.IntegerField()
+    user_id = serializers.IntegerField(required=False)
 
     class Meta:
         model=HealthRecordModel

@@ -1,15 +1,24 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
 from ml_app.models import HealthRecordModel
 
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('name',)
+
+# class AuthGroupSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = AuthGroup
+#         fields = ('name',)
 
 class UserSerializer(serializers.ModelSerializer):
     records = serializers.PrimaryKeyRelatedField(many=True, queryset=HealthRecordModel.objects.all())
-
+    groups = GroupSerializer(many=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'records']
+        fields = ['id', 'username', 'records','groups']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):

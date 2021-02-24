@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -110,7 +110,7 @@ class HealthRecordModel(models.Model):
     target=models.IntegerField(blank=True,choices=BinaryChoices.choices)
 
     def __str__(self):
-        return 'Patient age: '+str(self.age)+' thal: '+str(self.thal)+' trestbps: '+str(self.trestbps)
+        return 'Patient thal {} , trestbps {} '.format(self.thal,self.trestbps)
 
     def save(self, *args, **kwargs):
         """
@@ -127,3 +127,20 @@ class HealthRecordModel(models.Model):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.get_or_create(user=instance)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        instance.groups.add(Group.objects.get(name='patient'))
+
+class UserDetailModel(models.Model):
+    class SexClass(models.TextChoices):
+        Male='M'
+        Female='F'
+
+    user_id=models.OneToOneField('auth.User',on_delete=models.CASCADE,primary_key=False)
+    age = models.FloatField(validators=[validate_age])
+    sex = models.CharField(max_length=2, choices=SexClass.choices, default=SexClass.Male)
+
+    def __str__(self):
+        return "user with the age {} and with the sex {}".format(self.age,self.sex)
