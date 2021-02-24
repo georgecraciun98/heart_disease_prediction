@@ -14,14 +14,22 @@ from tensorflow.keras.models import load_model
 
 from keras import Sequential
 from tensorflow.keras.layers import Dense
-from algorithms.svm_keras import model_loading
-from algorithms.data_processing import accuracy_metrics,load_encoder,split_data
+from algorithms.data_processing import accuracy_metrics,load_encoder,split_data,split_data_drop
 from sklearn.linear_model import LogisticRegression
 from tensorflow.keras import layers
 from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures    
 from keras.regularizers import l2
 from tensorflow.keras import activations
 
+
+from algorithms.svm_keras import model_loading as svm_loading
+from algorithms.binary_classifier import model_loading as loading_binary
+from algorithms.xg_boost import model_loading as loading_xg
+from algorithms.random_forest import model_loading as load_forest
+import joblib
+from sklearn.model_selection import StratifiedKFold
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
 # Let's make our correlation matrix a little prettier
 
 
@@ -133,36 +141,50 @@ def random_forest_classifier():
     pass
 def xg_boost_classifier():
     pass
+def save_sklearn_model(model,filename = 'finalized_model.sav'):
+    
+    joblib.dump(model, filename)
 
 #model=load_model("my_model03.h5",{"RandomFourierFeatures":RandomFourierFeatures},False)
 #y_pred=model.predict(X_test)
 
 #print_score(model,X_train,y_train,X_test,y_test,train=False)
 
+
 if __name__ == "__main__":
         
 
     df = pd.read_csv("./heart.csv")
 
-    input_shape=15
-    model=model_loading(input_shape)
-    X_train,y_train,X_test,y_test,x_val,y_val=split_data(df)
-        
-    encoder=load_encoder('models/encoder_30.h5')   
+    input_shape=30
+    model=loading_binary(input_shape)
+    X_train,y_train,X_test,y_test,x_val,y_val=split_data_drop(df,featured=False)
+    corr=df.corr()    
+    #encoder=load_encoder('models/encoder_30.h5')   
 
-    X_train_encode = encoder.predict(X_train)
+    #X_train_encode = encoder.predict(X_train)
     # encode the test data
-    X_test_encode = encoder.predict(X_test)                                                                                             
+    #X_test_encode = encoder.predict(X_test)                                                                                             
     #support_vector_machine()   
     
     # fit model on training set
-    model.fit(X_train_encode, y_train)
+    model.fit(X_train, y_train)
+    #save_sklearn_model(model,'./models/sklearn.sav')
     # make prediction on test set
     binary_class = lambda x : 1 if (x>=0.5) else 0 
     
-    y_pred = model.predict(X_test_encode)
+    y_pred = model.predict(X_test)
     y_pred=np.array([binary_class(i) for i in y_pred])
-    accuracy_metrics(y_pred,y_test)
+    
+    x_total=pd.concat([X_train,X_test],axis=0,ignore_index=True,verify_integrity=True)
+    y_total=pd.concat([y_train,y_test],axis=0,ignore_index=True,verify_integrity=True)
+    estimator = KerasClassifier(build_fn=loading_binary,input_shape=input_shape, epochs=100, batch_size=5, verbose=0)
+    kfold = StratifiedKFold(n_splits=10, shuffle=True)
+    results = cross_val_score(estimator, x_total, y_total, cv=kfold)
+    print("Baseline: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
+    
+    
+    #accuracy_metrics(y_pred,y_test)
     
     
     

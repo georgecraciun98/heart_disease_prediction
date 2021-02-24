@@ -1,8 +1,18 @@
+from django.conf import settings
+from django.contrib.auth.models import User, Group
 from django.db import models
-from ml_app.Validators.health_record_validator import validate_age,\
-    validate_trebtps,validate_thalach,validate_oldpeak
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+
+from ml_app.validators.health_record_validator import validate_age, \
+    validate_trebtps, validate_thalach, validate_oldpeak
+
+User._meta.get_field('email')._unique = True
+User._meta.get_field('email').blank = False
+User._meta.get_field('email').null = False
 # Create your models here.
-class HealthRecord(models.Model):
+class HealthRecordModel(models.Model):
     class SexClass(models.TextChoices):
         Male='M'
         Female='F'
@@ -23,6 +33,9 @@ class HealthRecord(models.Model):
         Type_0=0
         Type_1=1
         Type_2=2
+    #user=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="user_id",blank=True,null=True)
+    user = models.ForeignKey('auth.User', related_name='records', on_delete=models.CASCADE)
+
     age=models.FloatField(validators=[validate_age])
     sex=models.CharField(max_length=2,choices=SexClass.choices,default=SexClass.Male)
     """
@@ -95,3 +108,39 @@ class HealthRecord(models.Model):
     target - have disease or not (1=yes, 0=no) (= the predicted attribute)
     """
     target=models.IntegerField(blank=True,choices=BinaryChoices.choices)
+
+    def __str__(self):
+        return 'Patient thal {} , trestbps {} '.format(self.thal,self.trestbps)
+
+    def save(self, *args, **kwargs):
+        """
+        Use the `pygments` library to create a highlighted HTML
+        representation of the code snippet.
+        """
+
+        super(HealthRecordModel, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = "HeathRecords"
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.get_or_create(user=instance)
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        instance.groups.add(Group.objects.get(name='patient'))
+
+class UserDetailModel(models.Model):
+    class SexClass(models.TextChoices):
+        Male='M'
+        Female='F'
+
+    user_id=models.OneToOneField('auth.User',on_delete=models.CASCADE,primary_key=False)
+    age = models.FloatField(validators=[validate_age])
+    sex = models.CharField(max_length=2, choices=SexClass.choices, default=SexClass.Male)
+
+    def __str__(self):
+        return "user with the age {} and with the sex {}".format(self.age,self.sex)
