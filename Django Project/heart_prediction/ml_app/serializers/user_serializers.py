@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from ml_app.models import HealthRecordModel
+from ml_app.models import HealthRecordModel, UserDetailModel
+
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -28,3 +29,8 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+class UserDetailSerializer(serializers.ModelSerializer):
+    user_id = serializers.IntegerField(required=False)
+    class Meta:
+        model = UserDetailModel
+        fields= ['sex','birth_date','user_id']

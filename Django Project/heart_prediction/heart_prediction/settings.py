@@ -140,7 +140,7 @@ DJOSER = {
     "USER_ID_FIELD": "username",
     "LOGIN_FIELD": "username",
     "SEND_ACTIVATION_EMAIL": True,
-    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "ACTIVATION_URL": "/activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "reset_password/{uid}/{token}",
     'SERIALIZERS': {
         'token_create': 'ml_app.serializers.token_serializer.CustomTokenCreateSerializer',
