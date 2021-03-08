@@ -14,8 +14,9 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 #         fields = ('name',)
 
 class UserSerializer(serializers.ModelSerializer):
-    records = serializers.PrimaryKeyRelatedField(many=True, queryset=HealthRecordModel.objects.all())
-    groups = GroupSerializer(many=True)
+
+    records = serializers.PrimaryKeyRelatedField(many=True,required=False, queryset=HealthRecordModel.objects.all())
+    groups = GroupSerializer(many=True,required=False)
     class Meta:
         model = User
         fields = ['id', 'username', 'records','groups']

@@ -9,13 +9,13 @@ from ml_app.models import HealthRecordModel
 from ml_app.serializers.health_serializer import HealthRecordSerializer
 from ml_app.serializers.user_serializers import UserSerializer
 from .permissions import IsOwnerOrReadOnly
-
+from rest_framework.permissions import AllowAny
 
 class HealthRecordList(generics.ListCreateAPIView):
     model=HealthRecordModel
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly]
-    queryset = HealthRecordModel.objects.order_by('age').all()
+    queryset = HealthRecordModel.objects.order_by('id').all()
     serializer_class = HealthRecordSerializer
 
     def perform_create(self, serializer):
@@ -35,6 +35,7 @@ class HealthRecordDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
     queryset = User.objects.order_by('id').all()
     serializer_class = UserSerializer
     def list(self, request, *args, **kwargs):
