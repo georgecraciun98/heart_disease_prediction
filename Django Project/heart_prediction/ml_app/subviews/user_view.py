@@ -4,6 +4,7 @@ from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from ml_app.sub_permissions.group_permissions import IsPatient,IsDoctor
 
 from ml_app.submodels.user_details import  UserDetailModel
 from ml_app.serializers.health_serializer import HealthRecordSerializer
@@ -15,9 +16,14 @@ from django.http import Http404
 
 
 class UserDetailView(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                         IsPatient]
     model = UserDetailModel
-    queryset = UserDetailModel.objects.all()
     serializer_class = UserDetailSerializer
+
+    def get_queryset(self):
+        user=self.request.user
+        return UserDetailModel.objects.filter(user_id=user.pk)
 
     def get_object(self, pk):
         try:
@@ -25,22 +31,23 @@ class UserDetailView(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
         except self.queryset.model.DoesNotExist:
             raise Http404
 
-    def get(self, request, pk, format=None):
-        user = self.get_object(request.user.pk)
-        serializer = UserDetailSerializer(user)
+    def get(self, request, format=None):
+        #get user detail based on his user_id field
+        user_detail = self.get_object(request.user.pk)
+
+        serializer = UserDetailSerializer(user_detail)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
+
+    def put(self, request, format=None):
         try:
             user = self.get_object(request.user.pk)
             serializer = UserDetailSerializer(user, data=request.data)
-            print('1')
         except Http404:
             data=request.data
             data['user_id']=request.user.pk
             print(data)
             serializer=UserDetailSerializer(data=data)
-            print('2')
 
         if serializer.is_valid():
             serializer.save()

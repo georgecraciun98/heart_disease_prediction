@@ -12,8 +12,12 @@ urlpatterns = [
     path('', views.api_root),
     path('health_record/', views.HealthRecordList.as_view(),name='record-list'),
     path('health_record/<int:pk>/',views.HealthRecordDetail.as_view(),name='record-detail'),
+
     path('users/', views.UserList.as_view(),name='user-list'),
-    path('users/<int:pk>/', UserDetailView.as_view(),name='user-detail'),
+    path('users/me',views.UserDetail.as_view(),name='user-me'),
+    #show details for a user
+    path('users/detail/', UserDetailView.as_view(),name='user-detail-true'),
+
     #path('account_info/',UserDetailModel.as_view(),name='user-detail'),
     path('auth/',include('djoser.urls')),
     path('auth/',include('djoser.urls.authtoken')),

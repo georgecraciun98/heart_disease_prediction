@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework import generics
+from django.http import Http404
+from rest_framework import generics, status
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -45,9 +46,24 @@ class UserList(generics.ListCreateAPIView):
         return Response(serializer.data)
 
 
-class UserDetail(generics.RetrieveAPIView):
+class UserDetail(generics.GenericAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_object(self, pk):
+        try:
+            return User.objects.get(id=pk)
+        except self.queryset.model.DoesNotExist:
+            raise Http404
+
+    def get(self, request, format=None):
+        # get user detail based on his user_id field
+        user = self.get_object(request.user.pk)
+
+        serializer = UserSerializer(user)
+
+        return Response(serializer.data)
+
 
 
 @api_view(['GET'])
