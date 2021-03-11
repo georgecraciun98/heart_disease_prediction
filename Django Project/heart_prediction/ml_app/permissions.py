@@ -1,5 +1,5 @@
 from rest_framework import permissions
-
+from django.contrib.auth.models import User
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -8,7 +8,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
-        # so we'll always allow GET, HEAD or OPTIONS requests.
+        # so we'll always allow GET, HEAD or OPTIONS requests.MySQL Database
         if request.method in permissions.SAFE_METHODS:
             return True
 
@@ -16,16 +16,19 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.user == request.user
 
 
-class IsDoctor(permissions.BasePermission):
-    """
-    Custom permission to only allow owners of an object to edit it.
-    """
 
+
+
+class UserDetailPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        pass
     def has_object_permission(self, request, view, obj):
         # Read permissions are allowed to any request,
         # so we'll always allow GET, HEAD or OPTIONS requests.
-        if request.method in permissions.SAFE_METHODS:
+
+        user=User(pk=request.user.pk)
+        if user.has_perm('ml_app | user detail model | Can add user detail model'):
             return True
 
         # Write permissions are only allowed to the owner of the snippet.
-        return obj.user == request.user
+        return False

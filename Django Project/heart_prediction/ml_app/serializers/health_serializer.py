@@ -19,12 +19,6 @@ class HealthRecordSerializer(serializers.ModelSerializer):
 
     class Meta:
         model=HealthRecordModel
-        fields=('age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang',
+        fields=('cp','trestbps','chol','fbs','restecg','thalach','exang',
                 'oldpeak','slope','ca','thal','target','user_id')
 
-class GetRecordSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model=HealthRecordModel
-        fields=['age','sex','cp','trestbps','chol','fbs','restecg','thalach','exang',
-                'oldpeak','slope','ca','thal','target']
