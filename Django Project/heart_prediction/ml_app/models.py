@@ -13,9 +13,9 @@ from ml_app.submodels.user_details import *
 
 
 class PredictedData(models.Model):
-    model_id = models.ForeignKey(ModelConfiguration, related_name='models',
+    model = models.ForeignKey(ModelConfiguration, related_name='models',
                                  on_delete=models.DO_NOTHING)
-    record_id = models.ForeignKey(User, related_name='records', on_delete=models.CASCADE)
+    record = models.ForeignKey(User, related_name='records', on_delete=models.CASCADE)
     average_thalach=models.IntegerField()
     start_time=models.DateField()
     end_time=models.DateField()

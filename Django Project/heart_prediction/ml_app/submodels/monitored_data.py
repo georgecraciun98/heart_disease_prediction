@@ -19,7 +19,7 @@ from ml_app.submodels.user_details import *
 
 class MonitoredData(models.Model):
 
-    patient_id=models.ForeignKey(UserDetailModel,related_name='monitored_patient',on_delete=models.CASCADE)
+    patient=models.ForeignKey(UserDetailModel,related_name='monitored_patient',on_delete=models.CASCADE)
 
     api_value=models.IntegerField(default=0,null=True)
     start_time=models.DateField(null=True)

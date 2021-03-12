@@ -19,7 +19,7 @@ class BinaryChoices(models.IntegerChoices):
     Type_1=1
 class ModelConfiguration(models.Model):
 
-    researcher_id=models.ForeignKey(User,related_name='researchers',on_delete=models.CASCADE)
+    researcher=models.ForeignKey(User,related_name='researchers',on_delete=models.CASCADE)
     alg_name = models.CharField(max_length=30, choices=AlgName.choices, default=AlgName.Svm_keras)
     alg_description=models.CharField(max_length=100,null=True)
     precision=models.FloatField()

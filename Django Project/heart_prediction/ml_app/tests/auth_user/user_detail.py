@@ -33,7 +33,7 @@ class GetUserDetails(TestCase):
         token = Token.objects.get(user__username='alexandru32')
         client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-        response=client.get('http://127.0.0.1:8000/api/users/{}/detail/'.format(alexandru.pk))
+        response=client.get('http://127.0.0.1:8000/api/users/detail/')
 
         serializer=UserDetailSerializer(alexandru_details)
 

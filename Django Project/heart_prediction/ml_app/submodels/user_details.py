@@ -30,7 +30,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 class UserDetailModel(models.Model):
 
 
-    user=models.OneToOneField('auth.User',on_delete=models.CASCADE)
+    user=models.OneToOneField('auth.User',related_name='user',on_delete=models.CASCADE)
     sex = models.CharField(max_length=2, choices=SexClass.choices, default=SexClass.Male)
     birth_date=models.DateField(auto_now=False,auto_now_add=False,default=datetime.date(1997, 10, 19))
 
