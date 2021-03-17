@@ -33,4 +33,4 @@ class UserDetailSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(required=False)
     class Meta:
         model = UserDetailModel
-        fields= ['sex','birth_date','user_id']
+        fields= ['sex','birth_date','user_id','description']

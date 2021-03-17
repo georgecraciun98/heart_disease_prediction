@@ -16,6 +16,9 @@ User._meta.get_field('email').null = False
 class SexClass(models.TextChoices):
     Male = 'M'
     Female = 'F'
+class BinaryChoices(models.IntegerChoices):
+    Type_0 =0
+    Type_1 =1
 #create a token for every newly created user
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -31,8 +34,8 @@ class UserDetailModel(models.Model):
 
 
     user=models.OneToOneField('auth.User',related_name='user',on_delete=models.CASCADE)
-    sex = models.CharField(max_length=2, choices=SexClass.choices, default=SexClass.Male)
+    sex = models.IntegerField(max_length=2, choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
     birth_date=models.DateField(auto_now=False,auto_now_add=False,default=datetime.date(1997, 10, 19))
-
+    description=models.CharField(max_length=200)
     def __str__(self):
         return "user borned at {} and with the sex {}".format(self.birth_date,self.sex)

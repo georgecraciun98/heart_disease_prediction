@@ -16,11 +16,11 @@ class PredictedData(models.Model):
     model = models.ForeignKey(ModelConfiguration, related_name='models',
                                  on_delete=models.DO_NOTHING)
     record = models.ForeignKey(User, related_name='records', on_delete=models.CASCADE)
-    average_thalach=models.IntegerField()
-    start_time=models.DateField()
-    end_time=models.DateField()
+    average_thalach=models.IntegerField(null=True)
+    start_time=models.DateField(null=True)
+    end_time=models.DateField(null=True)
     target=models.IntegerField(choices=BinaryChoices.choices)
-
+    photo = models.ImageField(null=True)
     def __str__(self):
 
         return 'Patient with average thalach {} '.format(self.average_thalach)

@@ -1,16 +1,4 @@
-import datetime
 
-from django.conf import settings
-from django.contrib.auth.models import User, Group
-from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
-from ml_app.submodels.health_record import SexClass, HealthRecordModel
-from ml_app.submodels.model_configuration import ModelConfiguration
-from ml_app.submodels.user_details import UserDetailModel
-from ml_app.validators.health_record_validator import validate_age, \
-    validate_trebtps, validate_thalach, validate_oldpeak
 
 from ml_app.submodels.health_record import *
 from ml_app.submodels.model_configuration import *

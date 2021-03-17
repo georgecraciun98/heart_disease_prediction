@@ -20,14 +20,14 @@ class HealthRecordList(generics.ListCreateAPIView):
     serializer_class = HealthRecordSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user_id=self.request.user.pk)
+        serializer.save()
 
     def get_queryset(self):
         return self.queryset.filter(user_id=self.request.user.pk)
 
 
 
-class HealthRecordDetail(generics.RetrieveUpdateDestroyAPIView):
+class HealthRecordDetail(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly]
     queryset = HealthRecordModel.objects.all()

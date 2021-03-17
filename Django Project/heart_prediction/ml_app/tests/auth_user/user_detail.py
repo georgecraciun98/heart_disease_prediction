@@ -20,7 +20,7 @@ class GetUserDetails(TestCase):
 
         self.group=Group.objects.create(name='patient')
         self.alexandru.groups.add(self.group)
-        UserDetailModel.objects.create(sex='M',birth_date='1997-10-19',user_id=self.alexandru.pk)
+        UserDetailModel.objects.create(sex=1,birth_date='1997-10-19',user_id=self.alexandru.pk)
         self.view=UserDetailView.as_view()
 
     def test_get_user_details(self):
@@ -33,7 +33,7 @@ class GetUserDetails(TestCase):
         token = Token.objects.get(user__username='alexandru32')
         client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-        response=client.get('http://127.0.0.1:8000/api/users/detail/')
+        response=client.get('http://127.0.0.1:8000/api/patients/detail/')
 
         serializer=UserDetailSerializer(alexandru_details)
 
