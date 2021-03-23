@@ -28,13 +28,15 @@ class UserDetailView(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
     def get_object(self, pk):
         try:
             return UserDetailModel.objects.get(user_id=pk)
-        except self.queryset.model.DoesNotExist:
+        except UserDetailModel.DoesNotExist:
             raise Http404
 
     def get(self, request, format=None):
         #get user detail based on his user_id field
-        user_detail = self.get_object(request.user.pk)
-
+        try:
+            user_detail = self.get_object(request.user.pk)
+        except Http404:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         serializer = UserDetailSerializer(user_detail)
         return Response(serializer.data)
 
@@ -45,8 +47,8 @@ class UserDetailView(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
             serializer = UserDetailSerializer(user, data=request.data)
         except Http404:
             data=request.data
+
             data['user_id']=request.user.pk
-            print(data)
             serializer=UserDetailSerializer(data=data)
 
         if serializer.is_valid():

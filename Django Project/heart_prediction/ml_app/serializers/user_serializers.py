@@ -9,11 +9,6 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ('name',)
 
-# class AuthGroupSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = AuthGroup
-#         fields = ('name',)
-
 class UserSerializer(serializers.ModelSerializer):
 
     records = serializers.PrimaryKeyRelatedField(many=True,required=False, queryset=HealthRecordModel.objects.all())
@@ -29,8 +24,51 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+class HelperUserSerializer(serializers.ModelSerializer):
+
+
+    class Meta:
+        model = User
+        fields = [ 'first_name','last_name','username']
+
+
+
+
 class UserDetailSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(required=False)
+    user = HelperUserSerializer(required=False)
     class Meta:
         model = UserDetailModel
-        fields= ['sex','birth_date','user_id','description']
+        fields= ['user','sex','birth_date','user_id','description']
+
+    def to_representation(self, obj):
+        """Move fields from user to user representation."""
+        representation = super().to_representation(obj)
+        user_representation = representation.pop('user')
+        for key in user_representation:
+            representation[key] = user_representation[key]
+
+        return representation
+
+    def to_internal_value(self, data):
+        """Move fields related to user to their own user dictionary."""
+        user_internal = {}
+        for key in HelperUserSerializer.Meta.fields:
+            if key in data:
+                user_internal[key] = data.pop(key)
+
+        internal = super().to_internal_value(data)
+        internal['user'] = user_internal
+        return internal
+
+    def update(self, instance, validated_data):
+        """Update user and user. Assumes there is a user for every user."""
+        user_data = validated_data.pop('user')
+        super().update(instance, validated_data)
+
+        user = instance.user
+        for attr, value in user_data.items():
+            setattr(user, attr, value)
+        user.save()
+
+        return instance

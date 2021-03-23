@@ -36,7 +36,7 @@ class HealthRecordModel(models.Model):
 
     # user=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="user_id",blank=True,null=True)
     doctor_patients = models.ForeignKey(DoctorPatients, related_name='doctor_patients', on_delete=models.CASCADE)
-    sex = models.IntegerField(max_length=2, choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
+    sex = models.IntegerField( choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
     age = models.IntegerField()
 
     """

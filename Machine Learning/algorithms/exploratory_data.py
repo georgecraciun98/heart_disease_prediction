@@ -20,7 +20,7 @@ from tensorflow.keras.models import load_model
 
 from keras import Sequential
 from tensorflow.keras.layers import Dense
-df = pd.read_csv("./heart.csv")
+df = pd.read_csv("../heart.csv")
 df.head()
 
 
@@ -68,6 +68,7 @@ for i, column in enumerate(categorical_val, 1):
     plt.legend()
     plt.xlabel(column)
 
+#all categories of plots 
 def plots():
     # Create another figure
     plt.figure(figsize=(10, 8))
@@ -87,6 +88,68 @@ def plots():
     plt.xlabel("Age")
     plt.ylabel("Max Heart Rate")
     plt.legend(["Disease", "No Disease"]);
+     # Add some helpful info
+    plt.figure(figsize=(10, 8))
+    
+    # Scatter with postivie examples
+    plt.scatter(df.thalach[df.target==1],df.slope[df.target==1],
+                
+                c="salmon")
+    
+    # Scatter with negative examples
+    plt.scatter(df.thalach[df.target==0],df.slope[df.target==0],
+                
+                c="lightblue")
+    
+    plt.title("Heart Disease in function of Slope and Max Heart Rate")
+    plt.xlabel("Max Heart Rate")
+    plt.ylabel("Slope")
+    plt.legend(["Disease", "No Disease"]);
+def composition_plots():
+    # Create another figure
+    plt.figure(figsize=(10, 8))
+    
+    # Scatter with postivie examples
+    plt.scatter(df.age[df.target==1],
+                df.cp[df.target==1],
+                c="salmon")
+    
+    # Scatter with negative examples
+    plt.scatter(df.age[df.target==0],
+                df.cp[df.target==0],
+                c="lightblue")
+    
+    # Add some helpful info
+    plt.title("Heart Disease in function of Age and Chest Pain Type")
+    plt.xlabel("Age")
+    plt.ylabel("Chest Pain Type")
+    plt.yticks(np.arange(0, 4, 1),['Typical angina', 'Atypical angina', 'Non-anginal pain','Asymptomatic'])
+    
+    plt.legend(["Disease", "No Disease"]);
+    
+    
+
+def distribution_plots():
+    # Create another figure
+    plt.figure(figsize=(10, 8))
+    
+    plt.scatter(df.age[df.target==1],
+                df.cp[df.target==1],
+                c="red")
+    plt.scatter(df.age[df.target==0],
+                df.cp[df.target==0],
+                c="blue")
+    plt.title("Heart Disease in function of Age and Chest Pain Type")
+    plt.xlabel("Age")
+    plt.ylabel("Chest Pain Type")
+    plt.yticks(np.arange(0, 4, 1),['Typical angina', 'Atypical angina', 'Non-anginal pain','Asymptomatic'])
+    
+    plt.legend(["Disease", "No Disease"]);
+    
+    plt.figure(figsize=(10, 8))
+    df[df['target']==1].plot.hexbin(x='age', y='fbs', gridsize=15)
+    
+    
     
 def correlation_matrix():
     corr_matrix = df.corr()

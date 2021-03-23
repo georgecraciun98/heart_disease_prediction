@@ -21,3 +21,10 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetailModel
         fields = ['id','user', 'sex', 'birth_date','description']
+
+class PatientDetailSerializer(serializers.ModelSerializer):
+    user = PatientUserSerializer()
+
+    class Meta:
+        model = UserDetailModel
+        fields= ['user','sex','birth_date','description']

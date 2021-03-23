@@ -16,8 +16,9 @@ class PredictionService:
     def make_prediction(self,record_id):
         name = 'ml_app'
         # load your models and model weights here and these are linked      "MODELS" variable that we mentioned in "settings.py"
-        path = os.path.join(settings.MODELS, "xg_boost_sklearn.joblib")
-        loaded_model = load(r"S:\School\Licenta\Github Code\licence_machine_learning\Django Project\heart_prediction\models\xg_boost_sklearn.joblib")
+        #path = os.path.join(settings.MODELS, "xg_boost_sklearn.joblib")
+        path= r"S:\School\Licenta\Github Code\licence_machine_learning\Django Project\heart_prediction\models\xg_boost_sklearn.joblib"
+        loaded_model = load(path)
         health_model=HealthRecordModel.objects.filter(pk=record_id)
 
         values=health_model.values('age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
@@ -26,5 +27,5 @@ class PredictionService:
         y_pred=loaded_model.predict(df)
         print('prediction is done using ',y_pred)
         # #loaded_model.load_weights(path)
-        return loaded_model
+        return y_pred
 

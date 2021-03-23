@@ -8,8 +8,8 @@ from rest_framework.reverse import reverse
 
 from ml_app.models import HealthRecordModel, DoctorPatients, PredictedData
 from ml_app.serializers.health_serializer import HealthRecordSerializer
-from ml_app.serializers.patient_serializers import PatientSerializer
-from ml_app.serializers.user_serializers import UserSerializer
+from ml_app.serializers.patient_serializers import PatientSerializer, PatientDetailSerializer
+from ml_app.serializers.user_serializers import UserSerializer, UserDetailSerializer
 from ml_app.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import AllowAny
 
@@ -39,7 +39,10 @@ class PatientList(generics.ListAPIView):
         queryset = self.filter_queryset(self.get_queryset())
 
         serializer = self.get_serializer(queryset, many=True)
+
         return Response(serializer.data)
+
+
 
 class PatientAddRecord(generics.GenericAPIView):
     model= HealthRecordModel
@@ -104,7 +107,10 @@ class PatientAddRecord(generics.GenericAPIView):
             print('all data is',data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+"""
+    Classed used for making patients predictions, as an input this class
+    will take just the id of the patient and the record id . 
+"""
 class PatientPrediction(generics.ListAPIView):
     model= PredictedData
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
@@ -145,14 +151,42 @@ class PatientPrediction(generics.ListAPIView):
             doctor_patients = self.get_doctor_patients(pk,request.user.pk)
             #get last record
             last_record=self.get_last_record(doctor_patients.pk)
-            model=self.pred_service.make_prediction(last_record.id)
-
+            returned_value=self.pred_service.make_prediction(last_record.id)
+            PredictedData.objects.create(target=returned_value,record_id=last_record.id)
             #We need to make the prediction
 
-            return Response({"hi":"good"}, status=status.HTTP_201_CREATED)
+            return Response({'target':returned_value}, status=status.HTTP_201_CREATED)
         except Http404:
             Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
         return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)
 
+class PatientDetail(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                         IsDoctor]
+    model = UserDetailModel
+    serializer_class = PatientDetailSerializer
+
+
+    def get_object(self, pk):
+        try:
+            return UserDetailModel.objects.filter(id=pk)
+        except self.queryset.model.DoesNotExist:
+            raise Http404
+    def get_queryset(self,pk):
+        queryset = UserDetailModel.objects.order_by('id').filter(id=pk).first()
+        return queryset
+    def get(self, request,pk, format=None):
+        #get user detail based on his user_id field
+        try:
+
+            queryset = self.filter_queryset(self.get_queryset(pk))
+
+            serializer = self.get_serializer(queryset)
+
+            data=serializer.data
+            data['age']=calculate_age(queryset.birth_date)
+            return Response(data, status=status.HTTP_200_OK)
+        except Http404:
+            return Response({"hi":"bad"}, status=status.HTTP_200_OK)

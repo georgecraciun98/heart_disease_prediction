@@ -34,7 +34,7 @@ class UserDetailModel(models.Model):
 
 
     user=models.OneToOneField('auth.User',related_name='user',on_delete=models.CASCADE)
-    sex = models.IntegerField(max_length=2, choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
+    sex = models.IntegerField( choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
     birth_date=models.DateField(auto_now=False,auto_now_add=False,default=datetime.date(1997, 10, 19))
     description=models.CharField(max_length=200)
     def __str__(self):
