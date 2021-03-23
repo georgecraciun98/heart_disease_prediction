@@ -28,10 +28,15 @@ class HealthRecordModel(models.Model):
         Type_0 =0
         Type_1 =1
         Type_2 =2
+    class FlourosopyType(models.IntegerChoices):
+        Pain_0 =0
+        Pain_1 = 1
+        Pain_2 = 2
+        Pain_3 = 3
 
     # user=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="user_id",blank=True,null=True)
     doctor_patients = models.ForeignKey(DoctorPatients, related_name='doctor_patients', on_delete=models.CASCADE)
-    sex = models.CharField(max_length=2, choices=SexClass.choices, default=SexClass.Male)
+    sex = models.IntegerField( choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
     age = models.IntegerField()
 
     """
@@ -92,7 +97,7 @@ class HealthRecordModel(models.Model):
     the more blood movement the better (no clots)
 
     """
-    ca = models.IntegerField(choices=BinaryChoices.choices)
+    ca = models.IntegerField(choices=FlourosopyType.choices)
     """
     thal - thalium stress result
         1,3: normal
@@ -100,6 +105,7 @@ class HealthRecordModel(models.Model):
         7: reversable defect: no proper blood movement when excercising
     """
     thal = models.IntegerField(choices=ThalChoices.choices)
+    created_data=models.DateField(auto_now_add=True,null=True)
     def __str__(self):
         return 'Patient thal {} , trestbps {} '.format(self.thal, self.trestbps)
 
