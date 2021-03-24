@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from ml_app import views
 from ml_app.api import HealthRecordViewSet
-from ml_app.subviews.doctor_view import PatientList, PatientAddRecord, PatientPrediction, PatientDetail
+from ml_app.subviews.doctor_view import PatientList, PatientAddRecord, PatientPrediction, PatientDetail, Models
 from ml_app.subviews.user_view import UserDetailView
 
 router=routers.DefaultRouter()
@@ -30,4 +30,6 @@ urlpatterns = [
     path('patients/<int:pk>/', PatientDetail.as_view(),name='insert-record'),
     path('patients/<int:pk>/health_record/', PatientAddRecord.as_view(),name='insert-record'),
     path('patients/<int:pk>/predict/',PatientPrediction.as_view(),name='predict'),
+
+    path('models/', Models.as_view(),name='model-list'),
 ]

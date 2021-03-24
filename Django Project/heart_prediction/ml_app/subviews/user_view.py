@@ -47,9 +47,10 @@ class UserDetailView(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
             serializer = UserDetailSerializer(user, data=request.data)
         except Http404:
             data=request.data
+            UserDetailModel.objects.create(user_id=request.user.pk)
+            user = self.get_object(request.user.pk)
 
-            data['user_id']=request.user.pk
-            serializer=UserDetailSerializer(data=data)
+            serializer=UserDetailSerializer(user,data=data)
 
         if serializer.is_valid():
             serializer.save()
