@@ -10,12 +10,11 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('name',)
 
 class UserSerializer(serializers.ModelSerializer):
+    groups = GroupSerializer(many=True, required=False)
 
-    records = serializers.PrimaryKeyRelatedField(many=True,required=False, queryset=HealthRecordModel.objects.all())
-    groups = GroupSerializer(many=True,required=False)
     class Meta:
         model = User
-        fields = ['id', 'username', 'records','groups']
+        fields = ['id', 'username', 'groups']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -24,6 +23,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.set_password(password)
         user.save()
         return user
+
 class HelperUserSerializer(serializers.ModelSerializer):
 
 
