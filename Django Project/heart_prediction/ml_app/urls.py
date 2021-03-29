@@ -12,6 +12,7 @@ router.register('healthrecord',HealthRecordViewSet,'health')
 urlpatterns = [
     path('', views.api_root),
     path('auth/',include('djoser.urls')),
+    path('auth/',include('djoser.social.urls')),
     path('auth/',include('djoser.urls.authtoken')),
     path('health_record/', views.HealthRecordList.as_view(),name='record-list'),
     path('health_record/<int:pk>/',views.HealthRecordDetail.as_view(),name='record-detail'),

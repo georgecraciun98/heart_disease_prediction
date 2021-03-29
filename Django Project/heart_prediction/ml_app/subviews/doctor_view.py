@@ -70,7 +70,7 @@ class PatientAddRecord(generics.GenericAPIView):
         except self.queryset.model.DoesNotExist:
             raise Http404
     def get_queryset(self,pk):
-        return HealthRecordModel.objects.filter(doctor_patients_id=pk).order_by('created_data').first()
+        return HealthRecordModel.objects.filter(doctor_patients_id=pk).order_by('-created_data').first()
     def get(self, request,pk, format=None):
         #get user detail based on his user_id field
 
