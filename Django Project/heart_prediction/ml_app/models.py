@@ -14,7 +14,7 @@ from ml_app.submodels.user_details import *
 class PredictedData(models.Model):
     model = models.ForeignKey(ModelConfiguration, related_name='models',
                                  on_delete=models.DO_NOTHING,null=True)
-    record = models.ForeignKey(User, related_name='records', on_delete=models.CASCADE)
+    record = models.ForeignKey(HealthRecordModel, related_name='records', on_delete=models.CASCADE)
     average_thalach=models.IntegerField(null=True)
     start_time=models.DateField(null=True)
     end_time=models.DateField(null=True)
