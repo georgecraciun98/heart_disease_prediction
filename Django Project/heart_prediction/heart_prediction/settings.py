@@ -131,6 +131,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
     'social_core.backends.google.GoogleOAuth2',
     'rest_framework.authentication.TokenAuthentication'
 
@@ -181,7 +182,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '763395887838-c6k030h2fjciv08n7ljouq68j9ddk3pg.apps.googleusercontent.com'
-
+GOOGLE_FIT_CLIENT_KEY='763395887838-ci1tlkotpm17kgs7nj72ab8f9vk2c6nq.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '4__ERyQm4BI2dXUTHAgpbhtZ'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE=['https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/fitness.activity.read','https://www.googleapis.com/auth/fitness.location.read','openid']
 
+#AUTH_USER_MODEL="ml_app.UserAccount"

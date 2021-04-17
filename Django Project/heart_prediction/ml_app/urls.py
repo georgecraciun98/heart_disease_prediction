@@ -5,7 +5,7 @@ from ml_app import views
 from ml_app.api import HealthRecordViewSet
 from ml_app.subviews.doctor_view import PatientList, PatientAddRecord, PatientPrediction, PatientDetail, Models
 from ml_app.subviews.user_view import UserDetailView
-
+from ml_app.subviews.extract_data import ExtractData
 router=routers.DefaultRouter()
 router.register('healthrecord',HealthRecordViewSet,'health')
 
@@ -34,6 +34,8 @@ urlpatterns = [
     path('patients/<int:pk>/predict/',PatientPrediction.as_view(),name='predict'),
 
     path('models/', Models.as_view(),name='model-list'),
+
+    path('extract_data/',ExtractData.as_view(),name='extract-data')
 ]
 
 #urlpatterns += [re_path(r'^.*',TemplateView.as_view(template_name='index.html'))]
