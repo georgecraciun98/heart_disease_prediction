@@ -9,10 +9,11 @@ class MonitoredData(models.Model):
 
     patient=models.ForeignKey(UserDetailModel,related_name='monitored_patient',on_delete=models.CASCADE)
     api_value=models.IntegerField(default=0,null=True)
-    start_time=models.DateField(null=True)
-    end_time=models.DateField(null=True)
+    start_time=models.DateTimeField(null=True)
+    end_time=models.DateTimeField(null=True)
     activity_description=models.CharField(max_length=200,blank=True)
     activity_measure_type=models.CharField(max_length=300,blank=True)
+    data_type=models.CharField(max_length=100,blank=False)
     created_date=models.DateField(auto_now_add=True)
 
 
