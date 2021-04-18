@@ -22,7 +22,10 @@ def calculate_intervals():
     Here we calculate how many time intervals of one month we will need
     :return:
     """
-    start_time=1612415200000
+
+    #February
+    #start_time=1612415200000
+    start_time = 1606793460000
     len=1
     #one month miliseconds
     month_milis=2592000000
@@ -50,9 +53,10 @@ class ExtractData(generics.GenericAPIView):
             data_obj = MonitoredData.objects.filter(patient_id=2).order_by('-end_time').first()
             date=data_obj.end_time
             # date_time=datetime.combine(date.today(), datetime.min.time())
-            data_milis=round(date.timestamp())
+            data_milis=round(date.timestamp())*1000
             start_time=data_milis+1
             #create from last extraction
+            print('start time for extraction is',start_time)
             extractDataInstance = ExtractDataService(start_time, end_time)
             extractDataInstance.extract_data(token=token)
         else:

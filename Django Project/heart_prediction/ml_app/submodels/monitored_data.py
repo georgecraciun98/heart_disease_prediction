@@ -12,9 +12,9 @@ class MonitoredData(models.Model):
     start_time=models.DateTimeField(null=True)
     end_time=models.DateTimeField(null=True)
     activity_description=models.CharField(max_length=200,blank=True)
-    activity_measure_type=models.CharField(max_length=300,blank=True)
+    activity_source=models.CharField(max_length=300,blank=True)
     data_type=models.CharField(max_length=100,blank=False)
-    created_date=models.DateField(auto_now_add=True)
+    created_date=models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
