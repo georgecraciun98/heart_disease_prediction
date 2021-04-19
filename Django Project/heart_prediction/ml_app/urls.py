@@ -14,7 +14,6 @@ urlpatterns = [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.social.urls')),
     path('auth/', include('djoser.urls.authtoken')),
-    #path('auth/', include('djoser.social.urls')),
     path('health_record/', views.HealthRecordList.as_view(),name='record-list'),
     path('health_record/<int:pk>/',views.HealthRecordDetail.as_view(),name='record-detail'),
     #All the users

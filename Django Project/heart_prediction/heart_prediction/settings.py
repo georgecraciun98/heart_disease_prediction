@@ -62,6 +62,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'heart_prediction.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -145,19 +146,31 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000', 'localhost:3001'
 )
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
+#EMAIL:craciungeorge51@gmail.com
+#pass:dqoaebiueabziaun
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST='smtp.gmail.com'
+EMAIL_PORT=587
+EMAIL_HOST_USER='craciungeorge51@gmail.com'
+EMAIL_HOST_PASSWORD='dqoaebiueabziaun'
+EMAIL_USE_TLS=True
+DOMAIN = 'localhost:3000'
 DJOSER = {
     "USER_ID_FIELD": "username",
     "LOGIN_FIELD": "username",
     "SEND_ACTIVATION_EMAIL": True,
     #'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
     'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS':['http://localhost:3000'],
-    "ACTIVATION_URL": "/activate/{uid}/{token}",
+    "ACTIVATION_URL": "activate/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_URL": "reset_password/{uid}/{token}",
     'SERIALIZERS': {
         'token_create': 'ml_app.serializers.token_serializer.CustomTokenCreateSerializer',
     },
+    'USER_CREATE_PASSWORD_RETYPE':True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION':True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION':True,
+    'SEND_CONFIRMATION_EMAIL':True,
+    'SET_USERNAME_RETYPE':True
 }
 SITE_NAME = "HeartRecord"
 # Internationalization
