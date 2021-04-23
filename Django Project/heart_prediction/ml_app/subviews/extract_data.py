@@ -40,30 +40,34 @@ def calculate_intervals():
     return interval,time_intervals
 
 
-
+"""
+This service extracts google fit data 
+You need to provide a google token
+"""
 class ExtractData(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                          IsPatient]
 
     def post(self,request):
         token=request.data['token']
-        print('extracted token is',token)
+        print('google token is',token)
+        patient=request.user.user
         end_time=current_timestamp()
-        if(MonitoredData.objects.filter(patient_id=2).exists()):
-            data_obj = MonitoredData.objects.filter(patient_id=2).order_by('-end_time').first()
+        if(MonitoredData.objects.filter(patient_id=patient.id).exists()):
+            data_obj = MonitoredData.objects.filter(patient_id=patient.id).order_by('-end_time').first()
             date=data_obj.end_time
             # date_time=datetime.combine(date.today(), datetime.min.time())
             data_milis=round(date.timestamp())*1000
             start_time=data_milis+1
             #create from last extraction
             print('start time for extraction is',start_time)
-            extractDataInstance = ExtractDataService(start_time, end_time)
+            extractDataInstance = ExtractDataService(start_time, end_time,patient_id=patient.id)
             extractDataInstance.extract_data(token=token)
         else:
             interval,time_intervals=calculate_intervals()
             for i in range(interval):
                 start_time,end_time=time_intervals[i]
-                extractDataInstance = ExtractDataService(start_time, end_time)
+                extractDataInstance = ExtractDataService(start_time, end_time,patient_id=patient.id)
                 extractDataInstance.extract_data(token=token)
                 print('default start time  is', start_time,'end_time is',end_time)
 

@@ -8,7 +8,7 @@ from ml_app.submodels.doctor_patients import *
 from ml_app.submodels.health_record import *
 from ml_app.submodels.model_configuration import *
 from ml_app.submodels.monitored_data import *
-from ml_app.submodels.user_details import *
+from ml_app.submodels.patient_model import *
 from ml_app.submodels.auth_user import *
 
 class PredictedData(models.Model):

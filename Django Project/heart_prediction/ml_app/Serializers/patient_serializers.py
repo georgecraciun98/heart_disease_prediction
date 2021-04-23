@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from ml_app.models import HealthRecordModel, UserDetailModel
+from ml_app.models import HealthRecordModel, Patient
 
 
 
@@ -19,12 +19,12 @@ class PatientSerializer(serializers.ModelSerializer):
     user=PatientUserSerializer()
 
     class Meta:
-        model = UserDetailModel
+        model = Patient
         fields = ['id','user', 'sex', 'birth_date','description']
 
 class PatientDetailSerializer(serializers.ModelSerializer):
     user = PatientUserSerializer()
 
     class Meta:
-        model = UserDetailModel
+        model = Patient
         fields= ['user','sex','birth_date','description']

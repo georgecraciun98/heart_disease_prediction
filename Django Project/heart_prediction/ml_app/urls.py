@@ -3,7 +3,8 @@ from rest_framework import routers
 from django.views.generic import TemplateView
 from ml_app import views
 from ml_app.api import HealthRecordViewSet
-from ml_app.subviews.doctor_view import PatientList, PatientAddRecord, PatientPrediction, PatientDetail, Models
+from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, PatientPrediction, PatientDetail, Models
+from ml_app.subviews.monitored_data_view import MonitoredDataList
 from ml_app.subviews.user_view import UserDetailView
 from ml_app.subviews.extract_data import ExtractData
 router=routers.DefaultRouter()
@@ -22,15 +23,15 @@ urlpatterns = [
     path('users/me',views.UserDetail.as_view(),name='user-me'),
     #Show details for a patient,patient calls this route
     path('patients/detail/', UserDetailView.as_view(),name='user-detail-true'),
-
-    #path('account_info/',UserDetailModel.as_view(),name='user-detail'),
-
-    # path('token-auth/', include('rest_framework.urls', namespace='rest_framework'))
     #doctor perspective
     path('patients/', PatientList.as_view(),name='user-detail-true'),
-    path('patients/<int:pk>/', PatientDetail.as_view(),name='insert-record'),
-    path('patients/<int:pk>/health_record/', PatientAddRecord.as_view(),name='insert-record'),
+    path('patients/<int:pk>/', PatientDetail.as_view(), name='patient-detail'),
+    path('patients/<int:pk>/health_record/list', RecordList.as_view(),name='list-create-record'),
+    path('patients/<int:pk>/health_record/', RecordDetail.as_view(),name='retrieve-update-record'),
     path('patients/<int:pk>/predict/',PatientPrediction.as_view(),name='predict'),
+    path('patients/<int:pk>/monitored_data/list', RecordList.as_view(), name='get-patient-info'),
+
+    path('patients/monitored_data/list', MonitoredDataList.as_view(), name='retrieve-patient-info'),
 
     path('models/', Models.as_view(),name='model-list'),
 

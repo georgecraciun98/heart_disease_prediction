@@ -5,7 +5,7 @@ from rest_framework import status
 from ml_app.serializers.user_serializers import UserSerializer, UserDetailSerializer
 from rest_framework.test import force_authenticate, APIClient
 
-from ml_app.submodels.user_details import UserDetailModel
+from ml_app.submodels.patient_model import Patient
 from ml_app.subviews.user_view import UserDetailView
 from rest_framework.test import APIRequestFactory
 from rest_framework.authtoken.models import Token
@@ -20,7 +20,7 @@ class GetUserDetails(TestCase):
 
         self.group=Group.objects.create(name='patient')
         self.alexandru.groups.add(self.group)
-        UserDetailModel.objects.create(sex=1,birth_date='1997-10-19',user_id=self.alexandru.pk)
+        Patient.objects.create(sex=1,birth_date='1997-10-19',user_id=self.alexandru.pk)
         self.view=UserDetailView.as_view()
 
     def test_get_user_details(self):
@@ -28,7 +28,7 @@ class GetUserDetails(TestCase):
 
         client = APIClient()
         alexandru=User.objects.get(username='alexandru32')
-        alexandru_details=UserDetailModel.objects.get(user_id=alexandru.pk)
+        alexandru_details=Patient.objects.get(user_id=alexandru.pk)
 
         token = Token.objects.get(user__username='alexandru32')
         client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

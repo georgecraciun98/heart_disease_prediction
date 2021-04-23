@@ -23,7 +23,7 @@ class HealthRecordSerializer(serializers.ModelSerializer):
         return HealthRecordModel.objects.create(**validated_data)
     class Meta:
         model=HealthRecordModel
-        fields=('cp','trestbps','chol','fbs','restecg','thalach','exang',
+        fields=('cp','trestbps','created_data','chol','fbs','restecg','thalach','exang',
                 'oldpeak','slope','ca','thal','doctor_patients_id','age','sex')
 
 

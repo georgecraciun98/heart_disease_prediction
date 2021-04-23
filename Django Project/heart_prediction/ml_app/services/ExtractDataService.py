@@ -1,19 +1,15 @@
 import requests
-from django.conf import settings
-import json
-import httplib2
 from datetime import datetime
-
 import json
 import pytz
 from ml_app.submodels.monitored_data import MonitoredData
-import operator
-from functools import reduce
+
 class ExtractDataService:
 
-    def __init__(self,start_time,end_time):
+    def __init__(self,start_time,end_time,patient_id):
         self.start_time=start_time
         self.end_time=end_time
+        self.patient_id=patient_id
 
     def get_body(self,token):
         requestBody = {"aggregateBy": [{"dataTypeName": "com.google.heart_rate.bpm",
@@ -27,6 +23,8 @@ class ExtractDataService:
                                        {"dataTypeName": "com.google.sleep.segment"},
                                        {"dataTypeName": "com.google.step_count.delta"},
                                        {"dataTypeName": "com.google.active_minutes"},
+                                       {"dataTypeName": "com.google.active_minutes",
+                                        "dataSourceId":"derived:com.google.active_minutes:com.google.android.gms:merge_active_minutes"},
                                        {"dataTypeName": "com.google.weight"},
                                        {"dataTypeName": "com.google.speed"},
                                        {"dataTypeName": "com.google.calories.bmr",
@@ -63,7 +61,7 @@ class ExtractDataService:
         activity_description=''
         try:
             data=response.json()['bucket']
-            val_list = []
+            activity_value = 0
             for item in data:
                 startTimeNanos=int(item['startTimeMillis'])*pow(10,6)
                 endTimeNanos=int(item['endTimeMillis']) * pow(10, 6)
@@ -84,77 +82,77 @@ class ExtractDataService:
 
                                 if data_type=='com.google.heart_rate.summary':
                                     avg=data_point['value'][0]['fpVal']
-                                    val_list=avg
+                                    activity_value=avg
                                     activity_description='Average heart rate'
                                 elif data_type=='com.google.heart_minutes.summary':
-                                    val_list=data_point['value'][0]['fpVal']
+                                    activity_value=data_point['value'][0]['fpVal']
                                     activity_description='Heart minutes'
                                 elif data_type == 'com.google.step_count.delta':
-                                    val_list = data_point['value'][0]['intVal']
+                                    activity_value = data_point['value'][0]['intVal']
                                     activity_description = 'Daily step count'
                                 elif data_type == 'com.google.active_minutes':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Active Minutes'
                                 elif data_type == 'com.google.calories.expanded':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Minimum required Calories'
                                 elif data_type == 'com.google.calories.expended':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Expended Calories'
                                 elif data_type == 'com.google.distance.delta':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Distance Traveled in meters Since last Reading'
                                 elif data_type == 'com.google.speed.summary':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Average speed meters/second'
 
                                 elif data_type == 'com.google.weight.summary':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
 
                                     activity_description = 'Weight in kgs'
                                 elif data_type == 'com.google.height.summary':
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['fpVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
-
+                                        activity_value = data_point['value'][0]['intVal']
+                                    print('height in meters is',activity_value)
                                     activity_description = 'Height in meters'
                                 else:
                                     try:
 
-                                        val_list = data_point['value'][0]['intVal']
+                                        activity_value = data_point['value'][0]['intVal']
                                     except KeyError:
-                                        val_list = data_point['value'][0]['fpVal']
+                                        activity_value = data_point['value'][0]['fpVal']
                                     activity_description='other'
                         else:
                             nr_points=0
@@ -162,19 +160,20 @@ class ExtractDataService:
                         start_time=datetime.fromtimestamp(startTimeNanos/pow(10,9),tz=pytz.UTC)
 
                         end_time=datetime.fromtimestamp(endTimeNanos/pow(10,9),tz=pytz.UTC)
-
+                        
+                        activity_value=round(activity_value,2)
                         if nr_points==1:
-                            recorded_value=val_list
-                            monitored_data = MonitoredData(patient_id=2, api_value=recorded_value, start_time=start_time,
+                            recorded_value=activity_value
+                            monitored_data = MonitoredData(patient_id=self.patient_id, api_value=recorded_value, start_time=start_time,
                                                            end_time=end_time,
                                                            activity_source=data_source, data_type=data_type,
                                                            activity_description=activity_description)
                             monitored_data.save()
                         elif nr_points>1:
                             print('number of points is greater')
-                            for i in range(len(val_list)):
-                                recorded_value=val_list[i]
-                                monitored_data=MonitoredData(patient_id=2,api_value=recorded_value,start_time=start_time,end_time=end_time,
+                            for i in range(len(activity_value)):
+                                recorded_value=activity_value[i]
+                                monitored_data=MonitoredData(patient_id=self.patient_id,api_value=recorded_value,start_time=start_time,end_time=end_time,
                                                              activity_source=data_source,data_type=data_type,activity_description='activity_description')
                                 monitored_data.save()
         except KeyError:
