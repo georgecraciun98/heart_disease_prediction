@@ -7,6 +7,8 @@ Created on Fri Feb  5 11:12:59 2021
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import RandomizedSearchCV
+
 def model_loading():
     
     #Bagging Techniques
@@ -17,7 +19,7 @@ def model_loading():
     
     return clf
 
-from sklearn.model_selection import RandomizedSearchCV
+
 def estimation(clf,x_train,y_train):
     # Number of trees in random forest
     n_estimators = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)]

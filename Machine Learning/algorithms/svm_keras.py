@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.layers.experimental import RandomFourierFeatures
+from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures 
 import tensorflow as tf
 import numpy as np
 from algorithms.data_processing import load_encoder
