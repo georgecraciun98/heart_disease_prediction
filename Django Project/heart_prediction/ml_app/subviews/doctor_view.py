@@ -191,7 +191,7 @@ class PatientPrediction(generics.ListAPIView):
             doctor_patients = self.get_doctor_patients(pk,request.user.pk)
             #get last record
             last_record=self.get_last_record(doctor_patients.pk)
-            returned_value=self.pred_service.make_prediction(last_record.id)
+            returned_value=self.pred_service.make_prediction(last_record.id,data['model'])
             PredictedData.objects.create(model_id=data['model'],target=returned_value,record_id=last_record.id)
             #We need to make the prediction
 

@@ -4,7 +4,7 @@ from django.views.generic import TemplateView
 from ml_app import views
 from ml_app.api import HealthRecordViewSet
 from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, PatientPrediction, PatientDetail, Models
-from ml_app.subviews.monitored_data_view import MonitoredDataList
+from ml_app.subviews.monitored_data_view import MonitoredDataList, MonitoredDataDoctor
 from ml_app.subviews.user_view import UserDetailView
 from ml_app.subviews.extract_data import ExtractData
 router=routers.DefaultRouter()
@@ -32,6 +32,7 @@ urlpatterns = [
     path('patients/<int:pk>/monitored_data/list', RecordList.as_view(), name='get-patient-info'),
 
     path('patients/monitored_data/list', MonitoredDataList.as_view(), name='retrieve-patient-info'),
+    path('patients/monitored_data/list/<int:pk>', MonitoredDataDoctor.as_view(), name='retrieve-patient-info'),
 
     path('models/', Models.as_view(),name='model-list'),
 

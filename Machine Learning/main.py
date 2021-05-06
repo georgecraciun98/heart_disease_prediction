@@ -8,8 +8,6 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
-
-
 from tensorflow.keras.models import load_model
 
 from keras import Sequential
@@ -55,90 +53,14 @@ def print_score(clf, X_train, y_train, X_test, y_test, train=True):
         print(f"Confusion Matrix: \n {confusion_matrix(y_test, pred)}\n")
         
 
-def linear_regresion():
-    
-    model=keras.Sequential([
-        Dense(32,activation=tf.nn.relu,input_shape=[30]),
-        Dense(32,activation=tf.nn.relu),
-        Dense(32,activation=tf.nn.relu),
-        Dense(1),
-        ])
-    
-    optimizer = tf.keras.optimizers.RMSprop(0.0099)
-    model.compile(loss='mean_squared_error',optimizer=optimizer)
-    model.fit(X_train,y_train,epochs=500)
- 
-    model.save("my_model01.h5")
-    
-    model1=keras.models.load_model("my_model01.h5")
-    y_pred=model1.predict(X_test)
-          
-    m1 = tf.keras.metrics.MeanSquaredError()
-    m1.update_state(y_pred,y_test)
-    m1.result().numpy()
-    #0.13 MSE
-    
-
-#Logistic Regression
-def logistic_regretion():
-    
-    from keras.regularizers import L1L2
-    
-    reg = L1L2(l1=0.01, l2=0.01)
-    
-    model = keras.Sequential()
-    model.add(Dense(1, activation='sigmoid', kernel_regularizer=reg,input_shape=[30]))
-    model.compile(optimizer='rmsprop', loss='binary_crossentropy',metrics=[keras.metrics.CategoricalAccuracy(name="acc")])
-    model.fit(X_train, y_train, epochs=500, validation_data=(X_test, y_test))
-    model.save("my_model02.h5")
-    y_pred=model.predict(X_test)
-    
-    m1 = tf.keras.metrics.MeanSquaredError()
-    m1.update_state(y_pred,y_test)
-    m1.result().numpy()
-    
-    score = model.evaluate(X_test, y_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
-    
-    predict=model.predict(X_test)
-    #0.27 MSE
-    
-
-def support_vector_machine(x_val,y_val):
-   
-    model = keras.Sequential(
-    [
-        layers.Dense(20, input_shape=(30,)),
-        RandomFourierFeatures(
-            output_dim=4096, kernel_initializer="gaussian"
-        ),
-        layers.Dense(units=1,activation='sigmoid'),
-    ]
-    )
-    model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=1e-3),
-        loss=keras.losses.hinge,
-        metrics=['binary_accuracy'],
-    )
-    
-    model.fit(X_train,y_train,epochs=15,validation_data=(x_val, y_val))
-    model.save("my_model03.h5")
-    score = model.evaluate(X_test, y_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
-    predict=model.predict(X_test)
-    m1 = tf.keras.metrics.MeanSquaredError()
-    m1.update_state(predict,y_test)
-    m1.result().numpy()
-    
-
-
 def decision_tree_classifier():
     pass    
 
 def random_forest_classifier():
     pass
+"""
+sklearn model
+"""
 def xg_boost_classifier():
     input_shape=30
     model=load_from_file("./algorithms/xg_boost_sklearn.joblib")
@@ -156,6 +78,10 @@ def xg_boost_classifier():
 
     y_pred=model.predict(X_test)
     accuracy_metrics(y_pred,y_test)
+    save_sklearn_model(model,'xg_boost.sav')
+"""
+keras model
+"""
 def svm_prediction():
     df = pd.read_csv("./heart.csv")
 
@@ -169,7 +95,7 @@ def svm_prediction():
     print('Test loss:', score[0])
     print('Test accuracy:', score[1])
     predict=model.predict(x_test)
-    
+    model.save('svm_model.h5')
     y_pred=np.where(predict >= 0.5,1,0)
     
     encoder=load_encoder('./models/encoder_30.h5')
@@ -186,7 +112,9 @@ def svm_prediction():
     
     # make predictions on the test set
     y_pred_1 = model.predict(X_test_encode)
-
+"""
+keras model
+"""
 def binary_classifier():
     df = pd.read_csv("./heart.csv")
 
@@ -195,6 +123,7 @@ def binary_classifier():
     x_train,y_train,x_test,y_test,x_val,y_val=split_data(df)
     
     model.fit(x_train,y_train,epochs=15,validation_data=(x_val, y_val))
+    model.save('binary_classifier.sav')
     #keras evalutation function
     score = model.evaluate(x_test, y_test, verbose=0)
     print('Test loss:', score[0])
@@ -203,22 +132,19 @@ def binary_classifier():
     
     y_pred=np.where(predict >= 0.5,1,0)
     accuracy_metrics(y_pred,y_test)
+"""
+sklearn model
+"""
 def random_forest():
     df = pd.read_csv("./heart.csv")
-
     input_shape=30
-    model=load_forest(input_shape)
+    model=load_forest()
     x_train,y_train,x_test,y_test,x_val,y_val=split_data(df)
-    
-    model.fit(x_train,y_train,epochs=15,validation_data=(x_val, y_val))
-    #keras evalutation function
-    score = model.evaluate(x_test, y_test, verbose=0)
-    print('Test loss:', score[0])
-    print('Test accuracy:', score[1])
+    model.fit(x_train,y_train)
     predict=model.predict(x_test)
-    
     y_pred=np.where(predict >= 0.5,1,0)
     accuracy_metrics(y_pred,y_test)
+    save_sklearn_model(model,'random_forest.sav')
 def save_sklearn_model(model,filename = 'finalized_model.sav'):
     
     joblib.dump(model, filename)
@@ -235,46 +161,9 @@ def load_model_example():
 from sklearn.model_selection import train_test_split
 
 if __name__ == "__main__":
-        
-    # model=load_model_example()
-    
-    
-    # df = pd.read_csv("./heart.csv")
-    # X=df.drop('target',axis=1)
-    # y=df.target
-    # input_shape=30
-    # model=loading_binary(input_shape)
-    # X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3)
-    # corr=df.corr()    
-    # #encoder=load_encoder('models/encoder_30.h5')   
-
-    # #X_train_encode = encoder.predict(X_train)
-    # # encode the test data
-    # #X_test_encode = encoder.predict(X_test)                                                                                             
-    # #support_vector_machine()   
-    
-    # # fit model on training set
-    #model.fit(X_train, y_train)
-    #y_pred = model.predict(X_test)
-    # #save_sklearn_model(model,'./models/sklearn.sav')
-    # # make prediction on test set
-    # binary_class = lambda x : 1 if (x>=0.5) else 0 
-    #lr_clf = LogisticRegression(solver='liblinear')
-    #lr_clf.fit(X_train, y_train)
-    
-    #y_pred = lr_clf.predict(X_test)
-    # y_pred=np.array([binary_class(i) for i in y_pred])
-    
-    # x_total=pd.concat([X_train,X_test],axis=0,ignore_index=True,verify_integrity=True)
-    # y_total=pd.concat([y_train,y_test],axis=0,ignore_index=True,verify_integrity=True)
-    # estimator = KerasClassifier(build_fn=loading_binary,input_shape=input_shape, epochs=100, batch_size=5, verbose=0)
-    # kfold = StratifiedKFold(n_splits=10, shuffle=True)
-    # results = cross_val_score(estimator, x_total, y_total, cv=kfold)
-    # print("Baseline: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
-    
     
     #accuracy_metrics(y_pred,y_test)
-    #svm_prediction()
+    svm_prediction()
     #xg_boost_classifier()
     #binary_classifier()
-    random_forest()
+    #random_forest()
