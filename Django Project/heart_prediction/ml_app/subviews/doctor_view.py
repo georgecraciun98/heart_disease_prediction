@@ -192,6 +192,11 @@ class PatientPrediction(generics.ListAPIView):
             #get last record
             last_record=self.get_last_record(doctor_patients.pk)
             returned_value=self.pred_service.make_prediction(last_record.id,data['model'])
+            if returned_value >= 0.5:
+                returned_value=1
+            else:
+                returned_value=0
+            print('type of returned value is',type(returned_value))
             PredictedData.objects.create(model_id=data['model'],target=returned_value,record_id=last_record.id)
             #We need to make the prediction
 
