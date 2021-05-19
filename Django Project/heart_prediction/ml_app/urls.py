@@ -7,6 +7,8 @@ from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, Pa
 from ml_app.subviews.monitored_data_view import MonitoredDataList, MonitoredDataDoctor
 from ml_app.subviews.user_view import UserDetailView
 from ml_app.subviews.extract_data import ExtractData
+from ml_app.subviews.doctor_list import DoctorList, AppointmentGet
+
 router=routers.DefaultRouter()
 router.register('healthrecord',HealthRecordViewSet,'health')
 
@@ -23,6 +25,11 @@ urlpatterns = [
     path('users/', views.UserList.as_view(),name='user-list'),
     #Current User
     path('users/me',views.UserDetail.as_view(),name='user-me'),
+
+    #Doctor list
+    path('doctors/',DoctorList.as_view(),name='doctor-list'),
+
+    path('appointments/<int:pk>/',AppointmentGet.as_view(),name='appointment-list'),
     #Show details for a patient,patient calls this route
     path('patients/detail/', UserDetailView.as_view(),name='user-detail-true'),
     #doctor can retrieve all patients

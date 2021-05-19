@@ -10,6 +10,7 @@ from ml_app.submodels.model_configuration import *
 from ml_app.submodels.monitored_data import *
 from ml_app.submodels.patient_model import *
 from ml_app.submodels.auth_user import *
+from ml_app.submodels.appointments import *
 
 class PredictedData(models.Model):
     model = models.ForeignKey(ModelConfiguration, related_name='models',
