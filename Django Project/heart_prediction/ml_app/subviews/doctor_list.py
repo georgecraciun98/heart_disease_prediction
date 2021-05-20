@@ -60,8 +60,8 @@ class AppointmentGet(generics.ListCreateAPIView):
         return queryset
 
 
-    def perform_create(self, serializer):
-        serializer.save(patient=self.request.user.pk)
+    # def perform_create(self, serializer):
+    #     serializer.save(patient_id=self.request.user.pk)
 
     def list(self, request,pk, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset(pk))
@@ -74,10 +74,11 @@ class AppointmentGet(generics.ListCreateAPIView):
         data = {}
         try:
             patient = self.request.user.pk
-            data = request.data
-            data['doctor']=pk
-            data['patient']=patient
 
+            data = request.data
+            data['doctor_id']=pk
+            data['patient_id']=patient
+            print('patient is',patient)
             serializer = self.get_serializer(data=data)
         except Http404:
             Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)

@@ -6,11 +6,11 @@ from ml_app.serializers.patient_serializers import PatientUserSerializer
 
 
 class AppointmentSerializer(serializers.ModelSerializer):
-    doctor=serializers.IntegerField(required=True)
-    patient=serializers.IntegerField(required=True)
+    doctor_id=serializers.IntegerField(required=True)
+    patient_id=serializers.IntegerField(required=True)
     class Meta:
         model = Appointments
-        fields = ['patient', 'doctor','time']
+        fields = ['patient_id', 'doctor_id','time']
 
 class DoctorSerializer(serializers.ModelSerializer):
 

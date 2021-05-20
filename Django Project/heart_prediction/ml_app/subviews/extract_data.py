@@ -3,18 +3,12 @@ from rest_framework import generics, status
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
-
 from ml_app.services.ExtractDataService import ExtractDataService
 from ml_app.sub_permissions.group_permissions import IsPatient,IsDoctor
-
-
 from datetime import datetime,tzinfo
 from django.http import Http404
 import pytz
 from ml_app.submodels.monitored_data import MonitoredData
-
-
 def current_timestamp():
     return round(datetime.now().timestamp())*1000
 def calculate_intervals():
@@ -22,7 +16,6 @@ def calculate_intervals():
     Here we calculate how many time intervals of one month we will need
     :return:
     """
-
     #February
     #start_time=1612415200000
     start_time = 1606793460000
@@ -33,12 +26,9 @@ def calculate_intervals():
     interval=round((end_time-start_time)/month_milis)+1
     time_intervals=[]
     for i in range(interval):
-
         time_intervals.append([start_time,start_time+month_milis])
         start_time+=2592000000
-
     return interval,time_intervals
-
 
 """
 This service extracts google fit data 
