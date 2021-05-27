@@ -103,20 +103,20 @@ import joblib
 
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
-    # df = pd.read_csv("./heart.csv")
+    df = pd.read_csv("../heart.csv")
 
-    # input_shape=30
-    # model=model_loading(input_shape)
-    # x_train,y_train,x_test,y_test,x_val,y_val=split_data(df)
+    input_shape=30
+    model=keras.models.load_model(r'S:\School\Licenta\Github Code\licence_machine_learning\Machine Learning\algorithms\svm_model')
+    x_train,y_train,x_test,y_test,x_val,y_val=split_data(df)
     
-    # model.fit(x_train,y_train,epochs=15,validation_data=(x_val, y_val))
-    # #keras evalutation function
-    # score = model.evaluate(x_test, y_test, verbose=0)
-    # print('Test loss:', score[0])
-    # print('Test accuracy:', score[1])
-    # predict=model.predict(x_test)
+    model.fit(x_train,y_train,epochs=15,validation_data=(x_val, y_val))
+    #keras evalutation function
+    score = model.evaluate(x_test, y_test, verbose=0)
+    print('Test loss:', score[0])
+    print('Test accuracy:', score[1])
+    predict=model.predict(x_test)
     
-    
+
     # y_pred=np.where(predict >= 0.5,1,0)
     
     

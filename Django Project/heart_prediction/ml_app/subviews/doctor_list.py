@@ -90,3 +90,42 @@ class AppointmentGet(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     ""
+class AppointmentHours(generics.ListCreateAPIView):
+    model = Appointments
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsPatient]
+
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self,pk):
+        queryset = Appointments.objects.filter(doctor_id=pk)
+        return queryset
+
+
+    # def perform_create(self, serializer):
+    #     serializer.save(patient_id=self.request.user.pk)
+
+    def list(self, request,pk, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset(pk))
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    ""
+class AppointmentPatient(generics.ListCreateAPIView):
+    model = Appointments
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsPatient]
+
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self,pk):
+        queryset = Appointments.objects.filter(patient_id=pk)
+        return queryset
+
+    def list(self, request,pk, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset(pk))
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+

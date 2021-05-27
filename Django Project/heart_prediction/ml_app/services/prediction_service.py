@@ -27,9 +27,11 @@ from sklearn.ensemble import RandomForestClassifier
 from joblib import dump, load
 
 full_path = r"S:\School\Licenta\Github Code\licence_machine_learning\Django Project\heart_prediction\models"
-
+full_path_svm=r'S:\School\Licenta\Github Code\licence_machine_learning\Django Project\heart_prediction\models\svm_model'
 
 class PredictionService:
+    def __init__(self):
+        self.categorical_val=['sex','cp','fbs','restecg','exang','slope','ca','thal']
     def get_record(self, pk):
         try:
             return HealthRecordModel.objects.order_by('created_data').get(id=pk)
@@ -56,8 +58,10 @@ class PredictionService:
 
         values=health_model.values('age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
                                    'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal')
+
         df = pd.DataFrame(list(values))
-        y_pred=model.predict(df)
+        df_data = pd.get_dummies(df, columns=self.categorical_val)
+        y_pred=model.predict(df_data)
         if(isinstance(y_pred, (np.ndarray, np.generic) )):
             print('original is',y_pred)
             print(y_pred[0])
@@ -65,9 +69,11 @@ class PredictionService:
         print('prediction is done using ',model_name.alg_name,'record id is',record_id,'result is',y_pred,type(y_pred))
         return y_pred
 
-    def svm_loading(self,input_shape):
+    def svm_loading(self):
 
-        model = keras.models.load_model(path.join(full_path,'svm_model.h5'))
+        # model = keras.models.load_model(path.join(full_path,'svm_model'))
+        model = keras.models.load_model(full_path_svm)
+
         return model
 
     def xg_boost_loading(self,input_shape):
@@ -130,3 +136,4 @@ class PredictionService:
             )],
         )
         return model
+
