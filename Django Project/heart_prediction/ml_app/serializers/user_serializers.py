@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from ml_app.models import HealthRecordModel, UserDetailModel
+from ml_app.models import HealthRecordModel, Patient
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -38,7 +38,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(required=False)
     user = HelperUserSerializer(required=False)
     class Meta:
-        model = UserDetailModel
+        model = Patient
         fields= ['user','sex','birth_date','user_id','description']
 
     def to_representation(self, obj):

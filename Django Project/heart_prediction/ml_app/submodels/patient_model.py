@@ -30,7 +30,7 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 #     if created:
 #         instance.groups.add(Group.objects.get(name='patient'))
 
-class UserDetailModel(models.Model):
+class Patient(models.Model):
 
 
     user=models.OneToOneField('auth.User',related_name='user',on_delete=models.CASCADE)

@@ -2,13 +2,13 @@
 
 from ml_app.submodels.health_record import *
 from ml_app.submodels.model_configuration import *
-from ml_app.submodels.user_details import *
+from ml_app.submodels.patient_model import *
 
 
 class MonitoredData(models.Model):
 
-    patient=models.ForeignKey(UserDetailModel,related_name='monitored_patient',on_delete=models.CASCADE)
-    api_value=models.IntegerField(default=0,null=True)
+    patient=models.ForeignKey(Patient,related_name='monitored_patient',on_delete=models.CASCADE)
+    api_value=models.FloatField(default=0,null=True)
     start_time=models.DateTimeField(null=True)
     end_time=models.DateTimeField(null=True)
     activity_description=models.CharField(max_length=200,blank=True)

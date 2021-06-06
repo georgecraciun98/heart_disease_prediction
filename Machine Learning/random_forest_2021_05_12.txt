@@ -1,0 +1,10 @@
+Random Forest
+accuracy score 0.8681318681318682
+confusion matrix  [[32  5]
+ [ 7 47]]
+Precision matrix  0.9038461538461539
+recall score  0.8703703703703703
+F1 score  0.8867924528301887
+roc auc score 0.8676176176176176
+[4;33mReloaded modules[24m: algorithms, algorithms.data_processing, algorithms.svm_keras, algorithms.binary_classifier, algorithms.xg_boost, algorithms.random_forest[0m
+Binary Classifier

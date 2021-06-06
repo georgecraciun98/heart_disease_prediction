@@ -15,16 +15,16 @@ from ml_app.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import AllowAny
 
 from ml_app.services.prediction_service import PredictionService
-from ml_app.sub_permissions.group_permissions import IsDoctor
+from ml_app.sub_permissions.group_permissions import IsDoctor, IsResearcher
 from ml_app.submodels.model_configuration import ModelConfiguration
-from ml_app.submodels.user_details import UserDetailModel
+from ml_app.submodels.patient_model import Patient
 from datetime import date
 
 def calculate_age(born):
     today = date.today()
     return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 class PatientList(generics.ListAPIView):
-    model= UserDetailModel
+    model= Patient
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsDoctor]
 
@@ -32,7 +32,7 @@ class PatientList(generics.ListAPIView):
 
     def get_queryset(self):
         doctor_id=self.request.user.pk
-        queryset = UserDetailModel.objects.order_by('id').filter(patients__doctor_id=doctor_id)
+        queryset = Patient.objects.order_by('id').filter(patients__doctor_id=doctor_id)
         return queryset
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user.pk)
@@ -46,7 +46,45 @@ class PatientList(generics.ListAPIView):
 
 
 
-class PatientAddRecord(generics.GenericAPIView):
+class RecordList(generics.ListCreateAPIView):
+    model = HealthRecordModel
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsDoctor]
+    serializer_class = HealthRecordSerializer
+
+    def get_object(self, pk1, pk2):
+        try:
+            print('primary keys are', pk1, pk2)
+            return DoctorPatients.objects.get(patient_id=pk1, doctor_id=pk2)
+        except self.queryset.model.DoesNotExist:
+            raise Http404
+
+    """
+        def perform_create(self, serializer):
+        serializer.save(user_id=self.request.user.pk)
+    """
+
+    def get_user_details(self, pk):
+        try:
+            return Patient.objects.get(id=pk)
+        except self.queryset.model.DoesNotExist:
+            raise Http404
+
+    def get_queryset(self, pk):
+        return HealthRecordModel.objects.filter(doctor_patients_id=pk).order_by('-created_data')
+
+    def get(self, request, pk, format=None):
+        doctor_patients = self.get_object(pk, request.user.pk)
+        health_models = self.get_queryset(doctor_patients.id)
+        serializer=self.get_serializer(health_models,many=True)
+        return Response(serializer.data)
+    def list(self, request, pk, format=None):
+        doctor_patients = self.get_object(pk, request.user.pk)
+        health_models = self.get_queryset(doctor_patients.id)
+        serializer=self.get_serializer(health_models,many=True)
+        return Response(serializer.data)
+
+class RecordDetail(generics.GenericAPIView):
     model= HealthRecordModel
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsDoctor]
@@ -66,7 +104,7 @@ class PatientAddRecord(generics.GenericAPIView):
     """
     def get_user_details(self,pk):
         try:
-            return UserDetailModel.objects.get(id=pk)
+            return Patient.objects.get(id=pk)
         except self.queryset.model.DoesNotExist:
             raise Http404
     def get_queryset(self,pk):
@@ -77,7 +115,6 @@ class PatientAddRecord(generics.GenericAPIView):
         doctor_patients = self.get_object(pk, request.user.pk)
         health_models = self.get_queryset(doctor_patients.id)
         try:
-            user_model = self.get_queryset(pk)
             serializer = HealthRecordSerializer(data=health_models.__dict__)
             if serializer.is_valid():
                 return Response(serializer.data)
@@ -125,7 +162,7 @@ class PatientPrediction(generics.ListAPIView):
     #get last predicted data
     def get_queryset(self):
         doctor_id=self.request.user.pk
-        queryset = UserDetailModel.objects.order_by('id').filter(patients__doctor_id=doctor_id)
+        queryset = Patient.objects.order_by('id').filter(patients__doctor_id=doctor_id)
         return queryset
     def perform_create(self, serializer):
         serializer.save(user_id=self.request.user.pk)
@@ -154,31 +191,36 @@ class PatientPrediction(generics.ListAPIView):
             doctor_patients = self.get_doctor_patients(pk,request.user.pk)
             #get last record
             last_record=self.get_last_record(doctor_patients.pk)
-            returned_value=self.pred_service.make_prediction(last_record.id)
+            returned_value=self.pred_service.make_prediction(last_record.id,data['model'])
+            if returned_value >= 0.5:
+                returned_value=1
+            else:
+                returned_value=0
+            print('type of returned value is',type(returned_value))
             PredictedData.objects.create(model_id=data['model'],target=returned_value,record_id=last_record.id)
             #We need to make the prediction
 
             return Response({'target':returned_value}, status=status.HTTP_201_CREATED)
         except Http404:
-            Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            Response({"Your object was not found"}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-        return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"Your object was not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 class PatientDetail(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                          IsDoctor]
-    model = UserDetailModel
+    model = Patient
     serializer_class = PatientDetailSerializer
 
 
     def get_object(self, pk):
         try:
-            return UserDetailModel.objects.filter(id=pk)
+            return Patient.objects.filter(id=pk)
         except self.queryset.model.DoesNotExist:
             raise Http404
     def get_queryset(self,pk):
-        queryset = UserDetailModel.objects.order_by('id').filter(id=pk).first()
+        queryset = Patient.objects.order_by('id').filter(id=pk).first()
         return queryset
     def get(self, request,pk, format=None):
         #get user detail based on his user_id field
@@ -194,10 +236,10 @@ class PatientDetail(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
         except Http404:
             return Response({"hi":"bad"}, status=status.HTTP_200_OK)
 
-class Models(generics.ListCreateAPIView):
+class PredictionModels(generics.ListCreateAPIView):
     model= ModelConfiguration
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsDoctor]
+                          IsResearcher]
 
     serializer_class = ModelSerializer
 
@@ -205,7 +247,7 @@ class Models(generics.ListCreateAPIView):
     #get last predicted data
     # def get_queryset(self):
     #     doctor_id=self.request.user.pk
-    #     queryset = UserDetailModel.objects.order_by('id').filter(patients__doctor_id=doctor_id)
+    #     queryset = Patient.objects.order_by('id').filter(patients__doctor_id=doctor_id)
     #     return queryset
     # def perform_create(self, serializer):
     #     serializer.save(user_id=self.request.user.pk)
@@ -216,20 +258,20 @@ class Models(generics.ListCreateAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    # def post(self, request,pk, format=None):
-    #
-    #     data={}
-    #     try:
-    #         doctor_patients = self.get_doctor_patients(pk,request.user.pk)
-    #         #get last record
-    #         last_record=self.get_last_record(doctor_patients.pk)
-    #         returned_value=self.pred_service.make_prediction(last_record.id)
-    #         PredictedData.objects.create(target=returned_value,record_id=last_record.id)
-    #         #We need to make the prediction
-    #
-    #         return Response({'target':returned_value}, status=status.HTTP_201_CREATED)
-    #     except Http404:
-    #         Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-    #
-    #
-    #     return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+
+        data={}
+        try:
+            researcher_id=self.request.user.pk
+            data=request.data
+            data['researcher_id']=researcher_id
+            print('all data is',data)
+            serializer = ModelSerializer( data=data)
+        except Http404:
+            Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        if serializer.is_valid():
+            serializer.save()
+            print('all data is',data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)

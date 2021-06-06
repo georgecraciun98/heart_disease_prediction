@@ -7,13 +7,18 @@ Created on Fri Feb  5 11:12:59 2021
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from datetime import datetime
+import sys
+date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+
+# sys.stdout=open(f"log_random_forest_{date}.txt","w")
 def model_loading():
     
     #Bagging Techniques
     clf=RandomForestClassifier(bootstrap=False, max_depth=20, max_features='sqrt',
                            min_samples_leaf=4, min_samples_split=5,
                            n_estimators=800)
-    
+                 
     
     return clf
 
@@ -50,3 +55,38 @@ def estimation(clf,x_train,y_train):
     cv_random.best_estimator_
     
     cv_random.best_score_
+
+import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import cross_validate
+
+if __name__ == "__main__":
+    input_shape=30
+    #model=load_from_file1("./algorithms/xg_boost_sklearn.joblib")
+    model = model_loading()
+    print("Random forest")
+
+    df = pd.read_csv("../heart.csv")
+    X=df.drop('target',axis=1)
+    y=df.target
+    # input_shape=30
+    # model=loading_binary(input_shape)
+    X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3)
+   
+
+    #keras evalutation function
+    # score = print_score(model, X_train, y_train, X_test, y_test,train=False)
+    # y_pred=model.predict(X_test)
+    estimator =model
+    x_total=pd.concat([X_train,X_test],axis=0,ignore_index=True,verify_integrity=True)
+    y_total=pd.concat([y_train,y_test],axis=0,ignore_index=True,verify_integrity=True)
+    kfold = StratifiedKFold(n_splits=10, shuffle=True)
+    scoring = {'acc': 'accuracy',
+           'prec_macro': 'precision_macro',
+           'rec_micro': 'recall_macro',
+           'prec':'precision',
+           'f1':'f1'}
+    results = cross_validate(estimator, x_total, y_total, cv=kfold,scoring=scoring)
+    print('results are',results)
+    
