@@ -7,7 +7,6 @@ from ml_app.models import HealthRecordModel, Patient
 
 class PatientUserSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = User
         fields = ['id', 'username','first_name','last_name','last_login']

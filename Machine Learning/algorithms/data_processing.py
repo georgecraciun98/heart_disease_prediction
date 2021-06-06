@@ -137,8 +137,9 @@ def split_input_output(df1,featured=False):
     return x_train,y_train,x_test,y_test,x_val,y_val
 
 
-def remove_cat_value(df,categorical_val,continous_val):
-    
+def remove_cat_value(df):
+    categorical_val=[]
+    continous_val=[]
     for column in df.columns:
         print('==============================')
         print(f"{column} : {df[column].unique()}")

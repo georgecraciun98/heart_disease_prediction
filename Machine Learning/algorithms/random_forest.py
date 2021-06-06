@@ -11,14 +11,14 @@ from datetime import datetime
 import sys
 date = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-sys.stdout=open(f"log_random_forest_{date}.txt","w")
+# sys.stdout=open(f"log_random_forest_{date}.txt","w")
 def model_loading():
     
     #Bagging Techniques
     clf=RandomForestClassifier(bootstrap=False, max_depth=20, max_features='sqrt',
                            min_samples_leaf=4, min_samples_split=5,
                            n_estimators=800)
-    
+                 
     
     return clf
 

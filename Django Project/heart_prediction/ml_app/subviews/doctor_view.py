@@ -15,7 +15,7 @@ from ml_app.permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import AllowAny
 
 from ml_app.services.prediction_service import PredictionService
-from ml_app.sub_permissions.group_permissions import IsDoctor
+from ml_app.sub_permissions.group_permissions import IsDoctor, IsResearcher
 from ml_app.submodels.model_configuration import ModelConfiguration
 from ml_app.submodels.patient_model import Patient
 from datetime import date
@@ -236,10 +236,10 @@ class PatientDetail(generics.RetrieveUpdateAPIView,generics.CreateAPIView):
         except Http404:
             return Response({"hi":"bad"}, status=status.HTTP_200_OK)
 
-class Models(generics.ListCreateAPIView):
+class PredictionModels(generics.ListCreateAPIView):
     model= ModelConfiguration
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
-                          IsDoctor]
+                          IsResearcher]
 
     serializer_class = ModelSerializer
 
@@ -258,20 +258,20 @@ class Models(generics.ListCreateAPIView):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    # def post(self, request,pk, format=None):
-    #
-    #     data={}
-    #     try:
-    #         doctor_patients = self.get_doctor_patients(pk,request.user.pk)
-    #         #get last record
-    #         last_record=self.get_last_record(doctor_patients.pk)
-    #         returned_value=self.pred_service.make_prediction(last_record.id)
-    #         PredictedData.objects.create(target=returned_value,record_id=last_record.id)
-    #         #We need to make the prediction
-    #
-    #         return Response({'target':returned_value}, status=status.HTTP_201_CREATED)
-    #     except Http404:
-    #         Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
-    #
-    #
-    #     return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, format=None):
+
+        data={}
+        try:
+            researcher_id=self.request.user.pk
+            data=request.data
+            data['researcher_id']=researcher_id
+            print('all data is',data)
+            serializer = ModelSerializer( data=data)
+        except Http404:
+            Response({"hi":"bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        if serializer.is_valid():
+            serializer.save()
+            print('all data is',data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)

@@ -3,11 +3,11 @@ from rest_framework import routers
 from django.views.generic import TemplateView
 from ml_app import views
 from ml_app.api import HealthRecordViewSet
-from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, PatientPrediction, PatientDetail, Models
+from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, PatientPrediction, PatientDetail, PredictionModels
 from ml_app.subviews.monitored_data_view import MonitoredDataList, MonitoredDataDoctor
 from ml_app.subviews.user_view import UserDetailView
 from ml_app.subviews.extract_data import ExtractData
-from ml_app.subviews.doctor_list import DoctorList, AppointmentGet,AppointmentPatient
+from ml_app.subviews.doctor_list import DoctorList, AppointmentGet,AppointmentByUser,AppointmentPatient,AppointmentDoctor
 
 router=routers.DefaultRouter()
 router.register('healthrecord',HealthRecordViewSet,'health')
@@ -31,7 +31,9 @@ urlpatterns = [
 
     #Get appointments by doctor id
     path('appointments/<int:pk>/',AppointmentGet.as_view(),name='appointment-doctors'),
-    path('appointments/<int:pk>/hours', AppointmentGet.as_view(), name='appointment-hours'),
+    path('appointments/by_user/<int:pk>/', AppointmentByUser.as_view(), name='appointment-users'),
+
+    path('appointments/<int:pk>/hours', AppointmentDoctor.as_view(), name='appointment-hours'),
 
     # Get appointments by patient id
     path('appointments/by_patient/<int:pk>/', AppointmentPatient.as_view(), name='appointment-doctors'),
@@ -59,7 +61,7 @@ urlpatterns = [
     path('patients/monitored_data/list/<int:pk>', MonitoredDataDoctor.as_view(), name='retrieve-patient-info'),
 
     #shows all models
-    path('models/', Models.as_view(),name='model-list'),
+    path('models/', PredictionModels.as_view(), name='model-list'),
 
     # This route is used for google fit data extraction
     path('extract_data/',ExtractData.as_view(),name='extract-data')

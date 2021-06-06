@@ -55,9 +55,19 @@ class PredictionService:
         elif (model_name.alg_name == 'Binary_Classifier'):
             model = self.binary_loading()
         health_model=HealthRecordModel.objects.filter(pk=record_id)
-
+        #split the values
         values=health_model.values('age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
                                    'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal')
+        # values = health_model.values('age', 'trestbps', 'chol', 'fbs',
+        #                              'restecg', 'thalach', 'oldpeak', 'sex_0',
+        #                              'sex_1', 'cp_0', 'cp_1', 'cp_2', 'cp_3', 'fbs_0', 'fbs_1', 'restecg_0',
+        #                              'restecg_1', 'restecg_2', 'exang_0', 'exang_1', 'slope_0', 'slope_1',
+        #                              'slope_2', 'ca_0', 'ca_1', 'ca_2', 'ca_3', 'ca_4', 'thal_0', 'thal_1',
+        #                              'thal_2', 'thal_3')
+        print(list(values))
+        list_initial=list(values)
+        print(type(list_initial))
+        list_initial[0].append({"a":"0"})
 
         df = pd.DataFrame(list(values))
         df_data = pd.get_dummies(df, columns=self.categorical_val)

@@ -12,3 +12,8 @@ class IsPatient(permissions.BasePermission):
         if request.user.groups.filter(name='patient'):
             return True
         return False
+class IsResearcher(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.groups.filter(name='researcher'):
+            return True
+        return False
