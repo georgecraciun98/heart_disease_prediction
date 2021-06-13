@@ -7,7 +7,7 @@ from rest_framework.reverse import reverse
 from ml_app.sub_permissions.group_permissions import IsPatient,IsDoctor
 
 from ml_app.submodels.patient_model import  Patient
-from ml_app.serializers.health_serializer import HealthRecordSerializer
+from ml_app.serializers.health_record_serializer import HealthRecordSerializer
 from ml_app.serializers.user_serializers import UserSerializer, UserDetailSerializer
 
 from django.http import Http404

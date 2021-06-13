@@ -45,37 +45,42 @@ class PredictionService:
         # loaded_model = load(path)
         model_name=ModelConfiguration.objects.get(id=model_id)
         input_shape=30
+        created_date=model_name.created_date
         model=""
         if(model_name.alg_name=='SVM_KERAS'):
-            model = self.svm_loading_1()
-        elif(model_name.alg_name=='Random_Forest'):
-            model = self.random_loading()
-        elif (model_name.alg_name == 'XGB_Classifier'):
-            model = self.xg_loading()
+            model = self.svm_loading_1(created_date)
+        elif (model_name.alg_name == 'Support Vector Machine'):
+            model = self.svm_loading_2(created_date)
+        elif(model_name.alg_name=='Random Forest Classifier'):
+            model = self.random_forest_2(created_date)
+        elif (model_name.alg_name == 'XGB Classifier'):
+            model = self.xg_loading_2(created_date)
         elif (model_name.alg_name == 'Binary_Classifier'):
-            model = self.binary_loading()
+            model = self.binary_loading_2()
         health_model=HealthRecordModel.objects.filter(pk=record_id)
         #split the values
-        values=health_model.values('age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
-                                   'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal')
-        # values = health_model.values('age', 'trestbps', 'chol', 'fbs',
-        #                              'restecg', 'thalach', 'oldpeak', 'sex_0',
-        #                              'sex_1', 'cp_0', 'cp_1', 'cp_2', 'cp_3', 'fbs_0', 'fbs_1', 'restecg_0',
-        #                              'restecg_1', 'restecg_2', 'exang_0', 'exang_1', 'slope_0', 'slope_1',
-        #                              'slope_2', 'ca_0', 'ca_1', 'ca_2', 'ca_3', 'ca_4', 'thal_0', 'thal_1',
-        #                              'thal_2', 'thal_3')
-        print(list(values))
-        list_initial=list(values)
-        print(type(list_initial))
-        list_initial[0].append({"a":"0"})
+        # values=health_model.values('age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
+        #                            'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal')
+        values = health_model.values('age', 'trestbps', 'chol',
+                                      'thalach', 'oldpeak', 'sex_0',
+                                     'sex_1', 'cp_0', 'cp_1', 'cp_2', 'cp_3', 'fbs_0', 'fbs_1', 'restecg_0',
+                                     'restecg_1', 'restecg_2', 'exang_0', 'exang_1', 'slope_0', 'slope_1',
+                                     'slope_2', 'ca_0', 'ca_1', 'ca_2', 'ca_3', 'ca_4', 'thal_0', 'thal_1',
+                                     'thal_2', 'thal_3')
+        # print(list(values))
+        # list_initial=list(values)
+        # print(type(list_initial))
+        # list_initial[0].append({"a":"0"})
 
         df = pd.DataFrame(list(values))
-        df_data = pd.get_dummies(df, columns=self.categorical_val)
-        y_pred=model.predict(df_data)
+        print('df is',df)
+
+        # df_data = pd.get_dummies(df, columns=self.categorical_val)
+        y_pred=model.predict(df)
         if(isinstance(y_pred, (np.ndarray, np.generic) )):
             print('original is',y_pred)
             print(y_pred[0])
-            y_pred=y_pred[0][0]
+            y_pred=y_pred[0]
         print('prediction is done using ',model_name.alg_name,'record id is',record_id,'result is',y_pred,type(y_pred))
         return y_pred
 
@@ -147,3 +152,27 @@ class PredictionService:
         )
         return model
 
+    def svm_loading_2(self,created_date):
+        input_shape=13
+        date = created_date.strftime("%m%d%Y_%H_%M_%S")
+        clf = load(path.join(full_path,f"support_vector_machine_{date}.joblib"))
+        return clf
+
+    def xg_loading_2(self,created_date):
+        input_shape=13
+        date = created_date.strftime("%m%d%Y_%H_%M_%S")
+        clf = load(path.join(full_path,f"random_forest_{date}.joblib"))
+        clf = load(path.join(full_path,'xg_boost_sklearn.joblib'))
+        return clf
+
+    def random_forest_2(self,created_date):
+        input_shape=13
+        date = created_date.strftime("%m%d%Y_%H_%M_%S")
+        clf = load(path.join(full_path,f"random_forest_{date}.joblib"))
+        return clf
+
+    def binary_loading_2(self,created_date):
+        input_shape=13
+        date = created_date.strftime("%m%d%Y_%H_%M_%S")
+        clf = load(path.join(full_path,f"binary_classifier_{date}.joblib"))
+        return clf

@@ -36,9 +36,11 @@ class HealthRecordModel(models.Model):
 
     # user=models.ForeignKey(User,on_delete=models.DO_NOTHING,related_name="user_id",blank=True,null=True)
     doctor_patients = models.ForeignKey(DoctorPatients, related_name='doctor_patients', on_delete=models.CASCADE)
-    sex = models.IntegerField( choices=BinaryChoices.choices, default=BinaryChoices.Type_1)
-    age = models.IntegerField()
 
+
+    age = models.IntegerField()
+    sex_0 = models.IntegerField(null=True,default=0 )
+    sex_1 = models.IntegerField(null=True,default=0)
     """
     cp - chest pain type
         0: Typical angina: chest pain related decrease blood supply to the heart
@@ -46,8 +48,17 @@ class HealthRecordModel(models.Model):
         2: Non-anginal pain: typically esophageal spasms (non heart related)
         3: Asymptomatic: chest pain not showing signs of disease
     """
-    cp =models.IntegerField(choices=ChestPainType.choices,
-                           default=ChestPainType.Pain_0)
+
+    cp_0 = models.IntegerField( null=True,default=0)
+    cp_1 = models.IntegerField(null=True,default=0)
+    cp_2 = models.IntegerField(null=True,default=0)
+    cp_3 = models.IntegerField(null=True,default=0)
+    """
+    fbs - (fasting blood sugar > 120 mg/dl) (1 = true; 0 = false)
+     '>126' mg/dL signals diabetes
+    """
+    fbs_0 = models.IntegerField(null=True,default=0)
+    fbs_1 = models.IntegerField(null=True,default=0)
     """
     trestbps - resting blood pressure (in mm Hg on admission to the hospital) 
     anything above 130-140 is typically cause for concern
@@ -57,11 +68,7 @@ class HealthRecordModel(models.Model):
     chol - serum cholestoral in mg/dl
     """
     chol =models.IntegerField()
-    """
-    fbs - (fasting blood sugar > 120 mg/dl) (1 = true; 0 = false)
-     '>126' mg/dL signals diabetes
-    """
-    fbs = models.IntegerField(choices=BinaryChoices.choices)
+
     """
     restecg - resting electrocardiographic results
         0: Nothing to note
@@ -71,14 +78,18 @@ class HealthRecordModel(models.Model):
         2: Possible or definite left ventricular hypertrophy
         Enlarged heart's main pumping chamber
     """
-    restecg = models.IntegerField(choices=ZeroToTwo.choices)
+    restecg_0=models.IntegerField(null=True,default=0)
+    restecg_1=models.IntegerField(null=True,default=0)
+    restecg_2=models.IntegerField(null=True,default=0)
+
     """
     thalach - maximum heart rate achieved
 
     """
     thalach = models.IntegerField(validators=[validate_thalach])
     # exercise induced angina (1 = yes; 0 = no)
-    exang = models.IntegerField(choices=BinaryChoices.choices)
+    exang_0=models.IntegerField(null=True,default=0)
+    exang_1=models.IntegerField(null=True,default=0)
     """
     oldpeak - ST depression induced by exercise relative to rest looks 
     at stress of heart during excercise unhealthy heart will stress more
@@ -90,24 +101,35 @@ class HealthRecordModel(models.Model):
         1: Flatsloping: minimal change (typical healthy heart)
         2: Downslopins: signs of unhealthy heart
     """
-    slope = models.IntegerField(choices=ZeroToTwo.choices)
+    slope_0=models.IntegerField(null=True,default=0)
+    slope_1=models.IntegerField(null=True,default=0)
+    slope_2=models.IntegerField(null=True,default=0)
+
     """
     ca - number of major vessels (0-3) colored by flourosopy
     colored vessel means the doctor can see the blood passing through
     the more blood movement the better (no clots)
 
     """
-    ca = models.IntegerField(choices=FlourosopyType.choices)
+    ca_0 = models.IntegerField( null=True,default=0)
+    ca_1 = models.IntegerField(null=True,default=0)
+    ca_2 = models.IntegerField(null=True,default=0)
+    ca_3 = models.IntegerField(null=True,default=0)
+    ca_4 = models.IntegerField(null=True,default=0)
+
     """
     thal - thalium stress result
         1,3: normal
         6: fixed defect: used to be defect but ok now
         7: reversable defect: no proper blood movement when excercising
     """
-    thal = models.IntegerField(choices=ThalChoices.choices)
-    created_data=models.DateField(auto_now_add=True,null=True)
+    thal_0 = models.IntegerField( null=True,default=0)
+    thal_1 = models.IntegerField(null=True,default=0)
+    thal_2 = models.IntegerField(null=True,default=0)
+    thal_3 = models.IntegerField(null=True,default=0)
+    created_data=models.DateTimeField(auto_now_add=True,null=True)
     def __str__(self):
-        return 'Patient thal {} , trestbps {} '.format(self.thal, self.trestbps)
+        return 'Patient thal {} , trestbps {} '.format(self.thal_0, self.trestbps)
 
     def save(self, *args, **kwargs):
         """
