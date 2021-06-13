@@ -16,15 +16,19 @@ class UserFilteredPrimaryKeyRelatedField(serializers.PrimaryKeyRelatedField):
 class HealthRecordSerializer(serializers.ModelSerializer):
     #user_id=serializers.PrimaryKeyRelatedField(many=True,read_only=True)
     doctor_patients_id = serializers.IntegerField(required=False)
-    age=serializers.IntegerField()
-    sex=serializers.IntegerField()
+    # age=serializers.IntegerField()
+    # sex=serializers.IntegerField()
     def create(self, validated_data):
         print('validated data is',validated_data)
         return HealthRecordModel.objects.create(**validated_data)
     class Meta:
         model=HealthRecordModel
-        fields=('id','cp','trestbps','created_data','chol','fbs','restecg','thalach','exang',
-                'oldpeak','slope','ca','thal','doctor_patients_id','age','sex')
+        fields=('id','sex_0','sex_1','cp_0','cp_1','cp_2','cp_3',
+                'fbs_0','fbs_1','restecg_0','restecg_1','restecg_2','exang_0',
+                'exang_1','slope_0','slope_1','slope_2',
+                'ca_0','ca_1','ca_2','ca_3','ca_4','thal_0','thal_1','thal_2','thal_3',
+                'trestbps','created_data','chol','thalach',
+                'oldpeak','doctor_patients_id','age')
 
 
 
