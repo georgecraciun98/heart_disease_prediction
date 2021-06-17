@@ -21,7 +21,7 @@ class DoctorList(generics.ListCreateAPIView):
     serializer_class = PatientUserSerializer
 
     def get_queryset(self):
-        patient_id=self.request.user.user.id
+        # patient_id=self.request.user.user.id
         queryset = User.objects.order_by('id').filter(groups__name='doctor')
         return queryset
     #

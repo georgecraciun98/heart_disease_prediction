@@ -56,7 +56,8 @@ class ExtractDataService:
 
         request_body,headers=self.get_body(token)
 
-        response=requests.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',data=request_body,headers=headers)
+        response=requests.post('https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate',data=request_body,
+                               headers=headers)
         data_source='empty'
         activity_description=''
         try:
@@ -164,8 +165,8 @@ class ExtractDataService:
                         activity_value=round(activity_value,2)
                         if nr_points==1:
                             recorded_value=activity_value
-                            monitored_data = MonitoredData(patient_id=self.patient_id, api_value=recorded_value, start_time=start_time,
-                                                           end_time=end_time,
+                            monitored_data = MonitoredData(patient_id=self.patient_id, api_value=recorded_value,
+                                                           start_time=start_time,end_time=end_time,
                                                            activity_source=data_source, data_type=data_type,
                                                            activity_description=activity_description)
                             monitored_data.save()
@@ -173,8 +174,10 @@ class ExtractDataService:
                             print('number of points is greater')
                             for i in range(len(activity_value)):
                                 recorded_value=activity_value[i]
-                                monitored_data=MonitoredData(patient_id=self.patient_id,api_value=recorded_value,start_time=start_time,end_time=end_time,
-                                                             activity_source=data_source,data_type=data_type,activity_description='activity_description')
+                                monitored_data=MonitoredData(patient_id=self.patient_id,api_value=recorded_value,
+                                                             start_time=start_time,end_time=end_time,
+                                                             activity_source=data_source,data_type=data_type,
+                                                             activity_description='activity_description')
                                 monitored_data.save()
         except KeyError:
             pass

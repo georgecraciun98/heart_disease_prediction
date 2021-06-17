@@ -5,6 +5,7 @@ from ml_app import views
 from ml_app.api import HealthRecordViewSet
 from ml_app.subviews.doctor_view import PatientList,RecordList, RecordDetail, PatientPrediction, PatientDetail, PredictionModels
 from ml_app.subviews.monitored_data_view import MonitoredDataList, MonitoredDataDoctor
+from ml_app.subviews.researcher_view import ModelFileUpload
 from ml_app.subviews.user_view import UserDetailView
 from ml_app.subviews.extract_data import ExtractData
 from ml_app.subviews.doctor_list import DoctorList, AppointmentGet,AppointmentByUser,AppointmentPatient,AppointmentDoctor
@@ -62,7 +63,7 @@ urlpatterns = [
 
     #shows all models
     path('models/', PredictionModels.as_view(), name='model-list'),
-
+    path('models/file_upload',ModelFileUpload.as_view(), name='model-file'),
     # This route is used for google fit data extraction
     path('extract_data/',ExtractData.as_view(),name='extract-data')
 ]

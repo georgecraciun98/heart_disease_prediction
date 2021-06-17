@@ -404,7 +404,6 @@ class PredictionModels(generics.ListCreateAPIView):
         try:
             researcher_id=self.request.user.pk
             data=request.data
-
             data['researcher_id']=researcher_id
             if data['alg_name']=='Support Vector Machine':
                 serializer = ModelSerializer(data=data)

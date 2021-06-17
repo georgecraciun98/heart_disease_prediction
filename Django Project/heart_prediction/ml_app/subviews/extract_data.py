@@ -50,7 +50,6 @@ class ExtractData(generics.GenericAPIView):
             data_milis=round(date.timestamp())*1000
             start_time=data_milis+1
             #create from last extraction
-            print('start time for extraction is',start_time)
             extractDataInstance = ExtractDataService(start_time, end_time,patient_id=patient.id)
             extractDataInstance.extract_data(token=token)
         else:
@@ -59,7 +58,4 @@ class ExtractData(generics.GenericAPIView):
                 start_time,end_time=time_intervals[i]
                 extractDataInstance = ExtractDataService(start_time, end_time,patient_id=patient.id)
                 extractDataInstance.extract_data(token=token)
-                print('default start time  is', start_time,'end_time is',end_time)
-
-
         return Response("Extracted Data", status=status.HTTP_200_OK)

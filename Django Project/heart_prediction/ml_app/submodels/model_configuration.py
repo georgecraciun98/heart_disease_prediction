@@ -65,7 +65,7 @@ class ModelConfiguration(models.Model):
     min_samples_leaf=models.IntegerField(null=True)
     bootstrap=models.BooleanField(null=True)
     created_date=models.DateTimeField(auto_now_add=True)
-
+    source_file=models.FileField(null=True,blank=True,upload_to='media/documents/')
     #svm c,gamma,kernel
 
     c = models.FloatField(validators=[MinValueValidator(0.1),MaxValueValidator(20)],null=True)
