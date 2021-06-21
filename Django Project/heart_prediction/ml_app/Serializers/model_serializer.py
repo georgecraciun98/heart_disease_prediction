@@ -18,6 +18,7 @@ class ModelMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model= ModelConfiguration
         fields=('id','alg_name','alg_description','precision','accuracy','researcher_id',
+                'f1_score','recall_score',
                 'n_estimators','max_depth','booster','base_score',
                 'learning_rate','min_child_weight','max_features','min_samples_split',
                 'min_samples_leaf','bootstrap','c','gamma','kernel','solver','penalty')

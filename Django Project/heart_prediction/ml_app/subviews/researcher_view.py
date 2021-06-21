@@ -34,16 +34,6 @@ class ModelFileUpload(generics.ListCreateAPIView):
                           IsDoctororResearcher]
 
     serializer_class = ModelFile
-    # parser_classes = [FileUploadParser]
-
-
-    #get last predicted data
-    # def get_queryset(self):
-    #     doctor_id=self.request.user.pk
-    #     queryset = Patient.objects.order_by('id').filter(patients__doctor_id=doctor_id)
-    #     return queryset
-    # def perform_create(self, serializer):
-    #     serializer.save(user_id=self.request.user.pk)
     def get_response_image(self,pil_img):
         byte_arr = io.BytesIO()
         image2 = Image.fromarray(pil_img)
@@ -80,10 +70,113 @@ class ModelFileUpload(generics.ListCreateAPIView):
             showData=ShowData()
             model = ModelConfiguration.objects.order_by("-created_date").first()
 
-            img,img1,img2=showData.load_data(model.id)
+            img,img1,img2,img3=showData.load_data(model.id)
             img=self.get_response_image(img)
             img1=self.get_response_image(img1)
             img2 = self.get_response_image(img2)
-            return Response({"scatter":img,"heatmap":img1,"correlation":img2}, status=status.HTTP_201_CREATED)
+            img3 = self.get_response_image(img3)
+
+            return Response({"model_id":model.id,"scatter":img,"heatmap":img1,"correlation":img2,"pie":img3}, status=status.HTTP_201_CREATED)
 
         return Response({"hi":"bad"}, status=status.HTTP_400_BAD_REQUEST)
+
+class PredictionModelsTraining(generics.ListCreateAPIView):
+    model = ModelConfiguration
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsDoctororResearcher]
+
+    serializer_class = ModelSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = ModelConfiguration.objects.all()
+
+        serializer = ModelMetricsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+
+        data = {}
+        try:
+            researcher_id = self.request.user.pk
+            data = request.data
+            data['researcher_id'] = researcher_id
+            if data['alg_name'] == 'Support Vector Machine':
+                serializer = ModelSerializer(data=data)
+                pass
+            data1 = {}
+            data1['researcher_id'] = researcher_id
+            data1['alg_name'] = data['alg_name']
+            if data['alg_name'] == 'Random Forest Classifier':
+                data1['n_estimators'] = data['n_estimators']
+                data1['max_features'] = data['max_features']
+                data1['max_depth'] = data['max_depth']
+                data1['min_samples_split'] = data['min_samples_split']
+                data1['min_samples_leaf'] = data['min_samples_leaf']
+                data1['bootstrap'] = data['bootstrap']
+                serializer = ModelSerializer(data=data1)
+            if data['alg_name'] == "XGB Classifier":
+                data1['n_estimators'] = data['n_estimators']
+                data1['max_depth'] = data['max_depth']
+                data1['booster'] = data['booster']
+                data1['base_score'] = data['base_score']
+                data1['learning_rate'] = data['learning_rate']
+                data1['min_child_weight'] = data['min_child_weight']
+                serializer = ModelSerializer(data=data1)
+                print('data xgb classifier is', data1)
+            if data['alg_name'] == "Support Vector Machine":
+                data1['c'] = data['c']
+                data1['gamma'] = data['gamma']
+                data1['kernel'] = data['kernel']
+                serializer = ModelSerializer(data=data1)
+            if data['alg_name'] == "Binary Classifier":
+                data1['c'] = data['c']
+                data1['solver'] = data['solver']
+                data1['penalty'] = data['penalty']
+                serializer = ModelSerializer(data=data1)
+                print(data1)
+        except Http404:
+            Response({"hi": "bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        if serializer.is_valid():
+            serializer.save()
+            print('all data is', data)
+            modelSaving = ModelSaving()
+            modelSaving.train_model(name=data['alg_name'], data=data1, researcher_id=researcher_id)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response({"hi": "bad"}, status=status.HTTP_400_BAD_REQUEST)
+
+class PredictionModelsSaving(generics.ListCreateAPIView):
+    model = ModelConfiguration
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsDoctororResearcher]
+
+    serializer_class = ModelSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = ModelConfiguration.objects.filter(active=True)
+
+        serializer = ModelMetricsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+
+        data = {}
+        try:
+            researcher_id = self.request.user.pk
+            data = request.data
+            data['researcher_id'] = researcher_id
+            if data['alg_name'] == 'Support Vector Machine':
+                serializer = ModelSerializer(data=data)
+                pass
+            data1 = {}
+            data1['researcher_id'] = researcher_id
+            model_id=data['model_id']
+            model=ModelConfiguration.objects.get(id=model_id)
+            model.active=True
+            model.alg_description=model.alg_name+" Precision " + str(model.precision)+" Accuracy " + str(model.accuracy)
+            model.save()
+        except Http404:
+            Response({"hi": "bad"}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        return Response({"response":"model saved"}, status=status.HTTP_201_CREATED)
+

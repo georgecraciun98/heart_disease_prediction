@@ -14,6 +14,25 @@ class ShowData:
     def __init__(self):
         self.categorical_val=['sex','cp','fbs','restecg','exang','slope','ca','thal']
 
+    def pie_chart(self,df):
+        df.columns
+        size0 = df[df["target"] == 0].shape[0]
+        size1 = df[df["target"] == 1].shape[0]
+        sum = size0 + size1
+        size_0_perc = (size0 * 100) / sum
+        size_1_perc = (size1 * 100) / sum
+
+        sizes = [size_0_perc, size_1_perc]
+        explode = (0, 0.1)
+        labels = ["Have heart disease", "Don't have heart disease"]
+        fig1, ax1 = plt.subplots()
+        ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
+                shadow=True, startangle=90)
+        ax1.axis('equal')
+        plt.savefig('media/images/pie_chart.png',quality=10)
+
+        return ax1
+
     def load_data(self,model_id):
         name = 'ml_app'
         model=ModelConfiguration.objects.get(id=model_id)
@@ -59,4 +78,7 @@ class ShowData:
         plt1.figure.savefig('media/images/correlation.png', quality=10)
 
         img2 = cv2.imread('media/images/correlation.png')
-        return [img,img1,img2]
+        self.pie_chart(df)
+        img3 = cv2.imread('media/images/pie_chart.png')
+
+        return [img,img1,img2,img3]

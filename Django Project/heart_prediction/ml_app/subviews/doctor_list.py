@@ -61,9 +61,6 @@ class AppointmentDoctor(generics.ListCreateAPIView):
         queryset = Appointments.objects.filter(doctor_id=pk)
         return queryset
 
-    # def perform_create(self, serializer):
-    #     serializer.save(patient_id=self.request.user.pk)
-
     def list(self, request, pk, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset(pk))
 
@@ -129,17 +126,11 @@ class AppointmentByUser(generics.ListCreateAPIView):
             print('list is',queryset,pk)
             return queryset
 
-        # def perform_create(self, serializer):
-        #     serializer.save(patient_id=self.request.user.pk)
-
         def list(self, request, pk, *args, **kwargs):
             id = self.request.user.pk
-            print('id is',id)
             patient = Patient.objects.get(user_id=id)
             queryset = self.filter_queryset(self.get_queryset(pk=patient.id))
-
             serializer = self.get_serializer(queryset, many=True)
-
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         def post(self, request, pk, format=None):
@@ -151,14 +142,12 @@ class AppointmentByUser(generics.ListCreateAPIView):
                 data = request.data
                 data['doctor_id'] = pk
                 data['patient_id'] = patient
-                print('patient is', patient)
                 serializer = self.get_serializer(data=data)
             except Http404:
                 Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
 
             if serializer.is_valid():
                 serializer.save()
-                print('all data is', data)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
