@@ -398,3 +398,4 @@ class ModelSaving:
             self.save_model(rf_clf,name=f"xg_boost_{date}.joblib")
             self.print_score(rf_clf, X_train, y_train, X_test, y_test, train=True)
             self.print_score(rf_clf, X_train, y_train, X_test, y_test, train=False)
+        return accuracy_score1,precision_score1,f1_score1,roc_auc_score1

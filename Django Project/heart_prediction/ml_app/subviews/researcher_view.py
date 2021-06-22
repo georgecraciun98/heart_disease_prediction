@@ -85,7 +85,7 @@ class PredictionModelsTraining(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,
                           IsDoctororResearcher]
 
-    serializer_class = ModelSerializer
+    serializer_class = ModelMetricsSerializer
 
     def list(self, request, *args, **kwargs):
         queryset = ModelConfiguration.objects.all()
@@ -140,8 +140,13 @@ class PredictionModelsTraining(generics.ListCreateAPIView):
             serializer.save()
             print('all data is', data)
             modelSaving = ModelSaving()
-            modelSaving.train_model(name=data['alg_name'], data=data1, researcher_id=researcher_id)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            accuracy_score1,precision_score1,f1_score1,roc_auc_score1=modelSaving.train_model(name=data['alg_name'], data=data1, researcher_id=researcher_id)
+            data2=serializer.data
+            data2['precision']=precision_score1
+            data2['accuracy'] = accuracy_score1
+            data2['f1_score'] = f1_score1
+            data2['roc_auc_score'] = roc_auc_score1
+            return Response(data2, status=status.HTTP_201_CREATED)
 
         return Response({"hi": "bad"}, status=status.HTTP_400_BAD_REQUEST)
 
