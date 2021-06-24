@@ -59,7 +59,11 @@ class ModelSaving:
 
         s_sc = StandardScaler()
         col_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
-        dataset[col_to_scale] = s_sc.fit_transform(dataset[col_to_scale])
+
+
+        dataset[col_to_scale]= s_sc.fit_transform(dataset[col_to_scale])
+        dump(s_sc, 'std_scaler.bin',compress=True)
+
         return dataset
     def activate_model(self,name,data,researcher_id):
         pass

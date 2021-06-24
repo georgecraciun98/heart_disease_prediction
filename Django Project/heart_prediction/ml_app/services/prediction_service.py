@@ -4,10 +4,7 @@ from django.http import Http404
 
 from django.conf import settings
 from ml_app.submodels.health_record import HealthRecordModel
-from mlflow.sklearn import load_model
-from joblib import dump, load
-import pandas as pd
-import numpy as np
+
 from ml_app.submodels.model_configuration import ModelConfiguration
 import pandas as pd
 from os import path
@@ -74,7 +71,10 @@ class PredictionService:
 
         df = pd.DataFrame(list(values))
         print('df is',df)
-
+        scaler = load(open('scaler.pkl', 'rb'))
+        col_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+        df[col_to_scale] = scaler.transform(df[col_to_scale])
+        print('df is',df[col_to_scale])
         # df_data = pd.get_dummies(df, columns=self.categorical_val)
         y_pred=model.predict(df)
         if(isinstance(y_pred, (np.ndarray, np.generic) )):

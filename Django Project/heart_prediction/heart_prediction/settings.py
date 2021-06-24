@@ -200,3 +200,12 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '4__ERyQm4BI2dXUTHAgpbhtZ'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE=['https://www.googleapis.com/auth/userinfo.email','https://www.googleapis.com/auth/fitness.activity.read','https://www.googleapis.com/auth/fitness.location.read','openid']
 
 #AUTH_USER_MODEL="ml_app.UserAccount"
+PROJECT_ROOT   =   os.path.join(os.path.abspath(__file__))
+STATIC_ROOT  =   os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
+
+#  Add configuration for static files storage using whitenoise
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
