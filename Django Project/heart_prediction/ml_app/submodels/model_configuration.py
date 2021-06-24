@@ -51,6 +51,10 @@ class ModelConfiguration(models.Model):
     alg_description=models.CharField(max_length=100,null=True)
     precision=models.FloatField(null=True)
     accuracy=models.FloatField(null=True)
+    f1_score=models.FloatField(null=True)
+    recall_score=models.FloatField(null=True)
+    roc_auc_score=models.FloatField(null=True)
+
     target=models.IntegerField(choices=BinaryChoices.choices,null=True)
 
     n_estimators=models.IntegerField(null=True)
@@ -65,7 +69,7 @@ class ModelConfiguration(models.Model):
     min_samples_leaf=models.IntegerField(null=True)
     bootstrap=models.BooleanField(null=True)
     created_date=models.DateTimeField(auto_now_add=True)
-
+    source_file=models.FileField(null=True,blank=True,upload_to='media/documents/')
     #svm c,gamma,kernel
 
     c = models.FloatField(validators=[MinValueValidator(0.1),MaxValueValidator(20)],null=True)
@@ -76,7 +80,7 @@ class ModelConfiguration(models.Model):
 
     solver=models.CharField(max_length=20,null=True, choices=SolverChoices.choices)
     penalty=models.CharField(max_length=20,null=True,choices=PenaltyChoices.choices)
-
+    active=models.BooleanField(null=True,default=False)
     def __str__(self):
         # researcher=User.objects.get(pk=self.researcher_id)
         return 'Model with the algorithm {} , precision {} , accuracy {}, ' \

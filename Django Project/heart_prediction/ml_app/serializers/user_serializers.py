@@ -26,12 +26,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 class HelperUserSerializer(serializers.ModelSerializer):
 
-
     class Meta:
         model = User
         fields = [ 'first_name','last_name','username']
-
-
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

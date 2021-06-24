@@ -23,8 +23,6 @@ from tensorflow.keras.layers import Dense
 df = pd.read_csv("../heart.csv")
 df.head()
 
-
-
 df.isna().sum()
 
 categorical_val = []
@@ -46,8 +44,25 @@ def exploratory_analysis():
     df.target.value_counts().plot(kind="bar", color=["salmon", "lightblue"])
 
     
-#append continous variables 
 
+def pie_chart():
+    df.columns
+    size0 = df[df["target"] == 0].shape[0]
+    size1 = df[df["target"] == 1].shape[0]
+    sum=size0+ size1
+    size_0_perc=(size0 * 100) / sum
+    size_1_perc=(size1 * 100) / sum
+
+    sizes = [size_0_perc, size_1_perc]
+    explode = (0, 0.1)
+    labels=["Have heart disease","Don't have heart disease"]
+    fig1, ax1 = plt.subplots()
+    ax1.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%',
+            shadow=True, startangle=90)
+    ax1.axis('equal')
+
+#append continous variables 
+pie_chart()
 for column in df.columns:
     print('==============================')
     print(f"{column} : {df[column].unique()}")

@@ -23,11 +23,9 @@ class GetAllUserTest(TestCase):
     def test_get_all_users(self):
         client = Client()
         factory = APIRequestFactory()
-
         #client.login(username='alexandru232', password='superuser123')
         request = factory.get('http://127.0.0.1:8000/api/users/')
         response = self.view(request)
-
         users=User.objects.order_by('id').all()
         serializer=UserSerializer(users, many=True)
 
@@ -51,13 +49,9 @@ class ShortPasswordTestCase(TestCase):
 
     def test_get_all_users(self):
         client = Client()
-
         pk=self.alexandru.pk
-
         response = client.get('http://127.0.0.1:8000/api/users/{}/'.format(pk))
-
         user = User.objects.get(pk=self.alexandru.pk)
-
         serializer = UserSerializer(user)
 
         self.assertEqual(response.data, serializer.data)
