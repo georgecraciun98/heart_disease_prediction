@@ -1,23 +1,13 @@
-from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import generics, status
 from rest_framework import permissions
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 
 from ml_app.models import HealthRecordModel, DoctorPatients, PredictedData
 from ml_app.serializers.health_record_serializer import HealthRecordSerializer
-from ml_app.serializers.model_serializer import ModelSerializer, ModelMetricsSerializer
 from ml_app.serializers.patient_serializers import PatientSerializer, PatientDetailSerializer
-from ml_app.serializers.user_serializers import UserSerializer, UserDetailSerializer
-from ml_app.permissions import IsOwnerOrReadOnly
-from rest_framework.permissions import AllowAny
-
-from ml_app.services.model_saving import ModelSaving
 from ml_app.services.prediction_service import PredictionService
-from ml_app.sub_permissions.group_permissions import IsDoctor, IsResearcher, IsDoctororResearcher
-from ml_app.submodels.model_configuration import ModelConfiguration
+from ml_app.sub_permissions.group_permissions import IsDoctor
 from ml_app.submodels.patient_model import Patient
 from datetime import date
 
@@ -269,13 +259,7 @@ class RecordDetail(generics.GenericAPIView):
                 data2['thal_2'] = 1
             elif data1['thal'] == '7':
                 data2['thal_3'] = 1
-
-
-
-
             data2['doctor_patients_id']=doctor_patients.id
-
-
             serializer = HealthRecordSerializer( data=data2)
         except Http404:
             Response(serializer.errors, status=status.HTTP_406_NOT_ACCEPTABLE)
@@ -339,7 +323,6 @@ class PatientPrediction(generics.ListAPIView):
             print('type of returned value is',type(returned_value))
             PredictedData.objects.create(model_id=data['model'],target=returned_value,record_id=last_record.id)
             #We need to make the prediction
-
             return Response({'target':returned_value}, status=status.HTTP_201_CREATED)
         except Http404:
             Response({"Your object was not found"}, status=status.HTTP_406_NOT_ACCEPTABLE)

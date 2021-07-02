@@ -1,12 +1,7 @@
-import datetime
-
-from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+
 
 
 class AlgName(models.TextChoices):
@@ -49,11 +44,11 @@ class ModelConfiguration(models.Model):
     researcher=models.ForeignKey(User,related_name='researchers',on_delete=models.CASCADE)
     alg_name = models.CharField(max_length=30, choices=AlgName.choices, default=AlgName.Svm_keras)
     alg_description=models.CharField(max_length=100,null=True)
-    precision=models.FloatField(null=True)
-    accuracy=models.FloatField(null=True)
-    f1_score=models.FloatField(null=True)
-    recall_score=models.FloatField(null=True)
-    roc_auc_score=models.FloatField(null=True)
+    precision=models.DecimalField(null=True,max_digits=5,decimal_places=2)
+    accuracy=models.DecimalField(null=True,max_digits=5,decimal_places=2)
+    f1_score=models.DecimalField(null=True,max_digits=5,decimal_places=2)
+    recall_score=models.DecimalField(null=True,max_digits=5,decimal_places=2)
+    roc_auc_score=models.DecimalField(null=True,max_digits=5,decimal_places=2)
 
     target=models.IntegerField(choices=BinaryChoices.choices,null=True)
 

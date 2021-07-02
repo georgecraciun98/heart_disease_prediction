@@ -158,7 +158,7 @@ class PredictionModelsSaving(generics.ListCreateAPIView):
     serializer_class = ModelSerializer
 
     def list(self, request, *args, **kwargs):
-        queryset = ModelConfiguration.objects.filter(active=True)
+        queryset = ModelConfiguration.objects.filter(active=True).order_by('-accuracy')
 
         serializer = ModelMetricsSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -170,9 +170,7 @@ class PredictionModelsSaving(generics.ListCreateAPIView):
             researcher_id = self.request.user.pk
             data = request.data
             data['researcher_id'] = researcher_id
-            if data['alg_name'] == 'Support Vector Machine':
-                serializer = ModelSerializer(data=data)
-                pass
+
             data1 = {}
             data1['researcher_id'] = researcher_id
             model_id=data['model_id']

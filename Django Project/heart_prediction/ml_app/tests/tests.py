@@ -49,6 +49,7 @@ class ShortPasswordTestCase(TestCase):
 
     def test_get_all_users(self):
         client = Client()
+
         pk=self.alexandru.pk
         response = client.get('http://127.0.0.1:8000/api/users/{}/'.format(pk))
         user = User.objects.get(pk=self.alexandru.pk)

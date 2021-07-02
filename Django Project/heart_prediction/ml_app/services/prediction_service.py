@@ -1,23 +1,16 @@
-import os
-
 from django.http import Http404
-
-from django.conf import settings
 from ml_app.submodels.health_record import HealthRecordModel
 
 from ml_app.submodels.model_configuration import ModelConfiguration
 import pandas as pd
 from os import path
 from tensorflow.keras.layers import Dense
-
 from tensorflow.keras.models import Sequential
-from sklearn import preprocessing
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.python.keras.layers.kernelized import RandomFourierFeatures
 import tensorflow as tf
+
 import numpy as np
 from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -34,6 +27,25 @@ class PredictionService:
             return HealthRecordModel.objects.order_by('created_data').get(id=pk)
         except self.queryset.model.DoesNotExist:
             raise Http404
+    def svm_loading_1(self):
+        input_shape=13
+        model = keras.Sequential(
+            [
+                layers.Dense(20, input_shape=(input_shape,)),
+                RandomFourierFeatures(
+                    output_dim=4096, kernel_initializer="gaussian"
+                ),
+                layers.Dense(units=1, activation='sigmoid'),
+            ]
+        )
+        model.compile(
+            optimizer=keras.optimizers.Adam(learning_rate=1e-3),
+            loss=keras.losses.hinge,
+            metrics=[tf.keras.metrics.BinaryAccuracy(
+                name="binary_accuracy", dtype=None, threshold=0.5
+            )],
+        )
+        return model
     def make_prediction(self,record_id,model_id):
         name = 'ml_app'
         # load your models and model weights here and these are linked      "MODELS" variable that we mentioned in "settings.py"
@@ -70,7 +82,6 @@ class PredictionService:
         # list_initial[0].append({"a":"0"})
 
         df = pd.DataFrame(list(values))
-        print('df is',df)
         scaler = load(open('scaler.pkl', 'rb'))
         col_to_scale = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
         df[col_to_scale] = scaler.transform(df[col_to_scale])
@@ -132,25 +143,7 @@ class PredictionService:
                       )
         return model
 
-    def svm_loading_1(self):
-        input_shape=13
-        model = keras.Sequential(
-            [
-                layers.Dense(20, input_shape=(input_shape,)),
-                RandomFourierFeatures(
-                    output_dim=4096, kernel_initializer="gaussian"
-                ),
-                layers.Dense(units=1, activation='sigmoid'),
-            ]
-        )
-        model.compile(
-            optimizer=keras.optimizers.Adam(learning_rate=1e-3),
-            loss=keras.losses.hinge,
-            metrics=[tf.keras.metrics.BinaryAccuracy(
-                name="binary_accuracy", dtype=None, threshold=0.5
-            )],
-        )
-        return model
+
 
     def svm_loading_2(self,created_date):
         input_shape=13

@@ -62,6 +62,7 @@ urlpatterns = [
     #doctor can see patient monitored data by patient id
     path('patients/monitored_data/list/<int:pk>', MonitoredDataDoctor.as_view(), name='retrieve-patient-info'),
 
+    #Researcher View
     #shows all models
     path('models/train', PredictionModelsTraining.as_view(), name='model-list'),
     path('models/save', PredictionModelsSaving.as_view(), name='model-save'),
