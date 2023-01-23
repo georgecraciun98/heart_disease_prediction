@@ -24,8 +24,11 @@ https://github.com/georgecraciun98/heart_disease_prediction.git
 
 # Screenshots from the application:
 Sign up
+
 ![image](https://user-images.githubusercontent.com/61500265/214033281-d082749a-93f3-4a41-8ae1-3e4165e56722.png)
+
 Login
+
 ![image](https://user-images.githubusercontent.com/61500265/214033308-0fa2d64f-9cae-411b-8c22-18a6f817eb47.png)
 Medical appointments
 ![image](https://user-images.githubusercontent.com/61500265/214033330-30adb4b1-3639-4600-9981-8ec769076a47.png)
