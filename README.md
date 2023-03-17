@@ -1,4 +1,4 @@
-# heart_disease_prediction
+# Heart Disease Prediction Application
 
 This is a web application with the purpose of monitoring and tracking user activity using a Smart Band or Smart Watch, and predicting using Machine Learning Models if
 the user will have an heart disease.
