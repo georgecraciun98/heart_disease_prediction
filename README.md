@@ -5,9 +5,8 @@ the user will have an heart disease.
 
 
 # Installing the Backend app:
-1.	git clone
-https://github.com/georgecraciun98/heart_disease_prediction.git
-2.  Setting up local mysql database: https://ladvien.com/data-analytics-mysql-localhost-setup/
+1.	Clone repo: git clone https://github.com/georgecraciun98/heart_disease_prediction.git
+2.  Set up local mysql database
 3.  Set up google fit API & Google Oauth
 4.  Update database and google Auth credentials in settings.py
 5.  cd 'Django Project'
