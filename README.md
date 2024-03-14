@@ -1,7 +1,7 @@
 # Heart Disease Prediction Application
 
-This is a web application with the purpose of monitoring and tracking user activity using a Smart Band or Smart Watch, and predicting using Machine Learning Models if
-the user will have an heart disease.
+Web application with the purpose of monitoring and tracking user health activity using a Device compatible with Google Fit API.
+Doctors are able to predict if a user will have a heart disease, based on acquired data and manually inputted health records.
 
 
 # Installing the Backend app:
